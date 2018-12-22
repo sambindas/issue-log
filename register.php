@@ -131,6 +131,7 @@ header("Location: index.php");
                 
                 $('#form_submit').click(function(){
 
+
                     var name = $('#fullname').val();
                     var email = $('#email').val();
                     var phone = $('#phone').val();

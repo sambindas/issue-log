@@ -1,3 +1,10 @@
+<?php
+session_start();
+
+if (isset($_SESSION['email'])) {
+header("Location: index.php");
+    }
+?>
 <!doctype html>
 <html class="no-js" lang="en">
 
@@ -25,9 +32,6 @@
 </head>
 
 <body>
-    <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
     <!-- preloader area start -->
     <div id="preloader">
         <div class="loader"></div>
@@ -37,26 +41,30 @@
     <div class="login-area">
         <div class="container">
             <div class="login-box ptb--100">
-                <form>
+                <form action="javascript:;">
                     <div class="login-form-head">
                         <h4>Sign In</h4>
-                        <p>Hello there, Sign in to use the issue log</p>
+                        <p>Sign in to use the Issue log</p><br>
+                        <p id="formErr"></p>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
                             <label for="exampleInputEmail1">Email address</label>
-                            <input type="email" id="exampleInputEmail1">
+                            <input type="email" id="email">
                             <i class="ti-email"></i>
                         </div>
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Password</label>
-                            <input type="password" id="exampleInputPassword1">
+                            <input type="password" id="password">
                             <i class="ti-lock"></i>
                         </div>
                         <div class="row mb-4 rmber-area">
                             <div class="col-6 text-right">
                                 <a href="#">Forgot Password?</a>
                             </div>
+                        </div>
+                        <div class="submit-btn-area">
+                            <input value="Submit" id="form_submit" class="btn btn-primary" type="submit">
                         </div>
                         <div class="form-footer text-center mt-5">
                             <p class="text-muted">Don't have an account? <a href="register.php">Sign up</a></p>
@@ -81,6 +89,42 @@
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+            $('#form_submit').click(function(){
+
+                var email = $('#email').val();
+                var password = $('#password').val();
+
+                if (email == '' || password == '') {
+                    $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
+                    return false;
+                } else {
+
+                    $('#formErr').html('');
+
+
+                    var datastring = 'email='+email+'&password='+password;
+
+                    $.ajax({
+                        url: 'ajax/login.php',
+                        method: 'post',
+                        data: datastring,
+                        success: function(msg){
+                            if (msg == 1) {
+                                window.location.replace('index.php');
+                            } else {
+                                $('#formErr').html('<span class="alert alert-danger">Authentication Failed!</span>');
+                                return false;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
