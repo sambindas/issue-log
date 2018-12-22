@@ -40,7 +40,7 @@
                 <form>
                     <div class="login-form-head">
                         <h4>Sign In</h4>
-                        <p>Hello there, Sign in and start managing your Admin Template</p>
+                        <p>Hello there, Sign in to use the issue log</p>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
