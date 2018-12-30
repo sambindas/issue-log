@@ -1,13 +1,28 @@
 <?php
+
 session_start();
-
+require 'connection.php';
 require 'functions.php';
-
 checkUserSession();
 
 
+if (isset($_POST['submit_issue'])) {
+    $facility = $_POST['facility'];
+    $type = $_POST['type'];
+    $il = $_POST['il'];
+    $issue = $_POST['issue'];
+    $icr = $_POST['icr'];
+    $ad = $_POST['ad'];
+    $so = $_SESSION['name'];
+    $priority = $_POST['priority'];
+    $date = date('d-m-Y');
 
+        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, issue_client_reporter, affected_dept, support_officer, priority, status)
+         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$icr', '$ad', '$so', '$priority', 0)");
 
+        $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully.</span>';
+
+    }
 
 ?>
 
@@ -17,7 +32,7 @@ checkUserSession();
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Home Page</title>
+    <title>eClinic Issues Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -26,23 +41,27 @@ checkUserSession();
     <link rel="stylesheet" href="assets/css/metisMenu.css">
     <link rel="stylesheet" href="assets/css/owl.carousel.min.css">
     <link rel="stylesheet" href="assets/css/slicknav.min.css">
-    <!-- amchart css -->
+    <!-- amcharts css -->
     <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
-    <!-- others css -->
+    <!-- Start datatable css -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
+    <!-- style css -->
     <link rel="stylesheet" href="assets/css/typography.css">
     <link rel="stylesheet" href="assets/css/default-css.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+<script type="text/javascript" src="assets/ckeditor/ckeditor.js"></script>
     <!-- modernizr css -->
     <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 
-<body>
-        <!-- main content area start -->
-        <div class="main-content">
+<body id="mybody">
             <?php
-            include 'sidebar.php';
-            include 'header.php';
+            require 'sidebar.php';
+            require 'header.php';
             ?>
             <!-- page title area start -->
             <div class="page-title-area">
@@ -52,7 +71,17 @@ checkUserSession();
                             <h4 class="page-title pull-left">Dashboard</h4>
                             <ul class="breadcrumbs pull-left">
                                 <li><a href="index.html">Home</a></li>
-                                <li><span>Dashboard</span></li>
+                                <li><span>Issues Log</span></li>
+                                <li><span></span></li>
+                                <li><span></span></li>
+                                <li><button id="newissue" class="btn btn-primary btn-flat" data-toggle="modal" data-target=".newissue">New Issue</button></li>
+                                <li>
+                                <?php 
+                                if (isset($_SESSION['msg'])) {
+                                    echo $_SESSION['msg'];
+                                    unset($_SESSION['msg']);
+                                }
+                                ?></li>
                             </ul>
                         </div>
                     </div>
@@ -71,363 +100,213 @@ checkUserSession();
             </div>
             <!-- page title area end -->
             <div class="main-content-inner">
-                <!-- sales report area start -->
-                <div class="sales-report-area mt-5 mb-5">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="single-report mb-xs-30">
-                                <div class="s-report-inner pr--20 pt--30 mb-3">
-                                    <div class="icon"><i class="fa fa-btc"></i></div>
-                                    <div class="s-report-title d-flex justify-content-between">
-                                        <h4 class="header-title mb-0">Bitcoin</h4>
-                                        <p>24 H</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between pb-2">
-                                        <h2>$ 4567809,987</h2>
-                                        <span>- 45.87</span>
-                                    </div>
-                                </div>
-                                <canvas id="coin_sales1" height="100"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="single-report mb-xs-30">
-                                <div class="s-report-inner pr--20 pt--30 mb-3">
-                                    <div class="icon"><i class="fa fa-btc"></i></div>
-                                    <div class="s-report-title d-flex justify-content-between">
-                                        <h4 class="header-title mb-0">Bitcoin Dash</h4>
-                                        <p>24 H</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between pb-2">
-                                        <h2>$ 4567809,987</h2>
-                                        <span>- 45.87</span>
-                                    </div>
-                                </div>
-                                <canvas id="coin_sales2" height="100"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="single-report">
-                                <div class="s-report-inner pr--20 pt--30 mb-3">
-                                    <div class="icon"><i class="fa fa-eur"></i></div>
-                                    <div class="s-report-title d-flex justify-content-between">
-                                        <h4 class="header-title mb-0">Euthorium</h4>
-                                        <p>24 H</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between pb-2">
-                                        <h2>$ 4567809,987</h2>
-                                        <span>- 45.87</span>
-                                    </div>
-                                </div>
-                                <canvas id="coin_sales3" height="100"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- sales report area end -->
-                <!-- overview area start -->
                 <div class="row">
-                    <div class="col-xl-9 col-lg-8">
+                    <!-- Primary table start -->
+                    <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h4 class="header-title mb-0">Overview</h4>
-                                    <select class="custome-select border-0 pr-3">
-                                        <option selected>Last 24 Hours</option>
-                                        <option value="0">01 July 2018</option>
-                                    </select>
-                                </div>
-                                <div id="verview-shart"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-3 col-lg-4 coin-distribution">
-                        <div class="card h-full">
-                            <div class="card-body">
-                                <h4 class="header-title mb-0">Coin Distribution</h4>
-                                <div id="coin_distribution"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- overview area end -->
-                <!-- market value area start -->
-                <div class="row mt-5 mb-5">
-                    <div class="col-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-sm-flex justify-content-between align-items-center">
-                                    <h4 class="header-title mb-0">Market Value And Trends</h4>
-                                    <select class="custome-select border-0 pr-3">
-                                        <option selected>Last 24 Hours</option>
-                                        <option value="0">01 July 2018</option>
-                                    </select>
-                                </div>
-                                <div class="market-status-table mt-4">
-                                    <div class="table-responsive">
-                                        <table class="dbkit-table">
-                                            <tr class="heading-td">
-                                                <td class="mv-icon">Logo</td>
-                                                <td class="coin-name">Coin Name</td>
-                                                <td class="buy">Buy</td>
-                                                <td class="sell">Sells</td>
-                                                <td class="trends">Trends</td>
-                                                <td class="attachments">Attachments</td>
-                                                <td class="stats-chart">Stats</td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mv-icon"><img src="assets/images/icon/market-value/icon1.png" alt="icon">
-                                                </td>
-                                                <td class="coin-name">Dashcoin</td>
-                                                <td class="buy">30% <img src="assets/images/icon/market-value/triangle-down.png" alt="icon"></td>
-                                                <td class="sell">20% <img src="assets/images/icon/market-value/triangle-up.png" alt="icon"></td>
-                                                <td class="trends"><img src="assets/images/icon/market-value/trends-up-icon.png" alt="icon"></td>
-                                                <td class="attachments">$ 56746,857</td>
-                                                <td class="stats-chart">
-                                                    <canvas id="mvaluechart"></canvas>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mv-icon">
-                                                    <div class="mv-icon"><img src="assets/images/icon/market-value/icon2.png" alt="icon"></div>
-                                                </td>
-                                                <td class="coin-name">LiteCoin</td>
-                                                <td class="buy">30% <img src="assets/images/icon/market-value/triangle-down.png" alt="icon"></td>
-                                                <td class="sell">20% <img src="assets/images/icon/market-value/triangle-up.png" alt="icon"></td>
-                                                <td class="trends"><img src="assets/images/icon/market-value/trends-down-icon.png" alt="icon"></td>
-                                                <td class="attachments">$ 56746,857</td>
-                                                <td class="stats-chart">
-                                                    <canvas id="mvaluechart2"></canvas>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mv-icon">
-                                                    <div class="mv-icon"><img src="assets/images/icon/market-value/icon3.png" alt="icon"></div>
-                                                </td>
-                                                <td class="coin-name">Euthorium</td>
-                                                <td class="buy">30% <img src="assets/images/icon/market-value/triangle-down.png" alt="icon"></td>
-                                                <td class="sell">20% <img src="assets/images/icon/market-value/triangle-up.png" alt="icon"></td>
-                                                <td class="trends"><img src="assets/images/icon/market-value/trends-up-icon.png" alt="icon"></td>
-                                                <td class="attachments">$ 56746,857</td>
-                                                <td class="stats-chart">
-                                                    <canvas id="mvaluechart3"></canvas>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="mv-icon">
-                                                    <div class="mv-icon"><img src="assets/images/icon/market-value/icon4.png" alt="icon"></div>
-                                                </td>
-                                                <td class="coin-name">Bitcoindash</td>
-                                                <td class="buy">30% <img src="assets/images/icon/market-value/triangle-down.png" alt="icon"></td>
-                                                <td class="sell">20% <img src="assets/images/icon/market-value/triangle-up.png" alt="icon"></td>
-                                                <td class="trends"><img src="assets/images/icon/market-value/trends-up-icon.png" alt="icon"></td>
-                                                <td class="attachments">$ 56746,857</td>
-                                                <td class="stats-chart">
-                                                    <canvas id="mvaluechart4"></canvas>
-                                                </td>
-                                            </tr>
+                                <h4 class="header-title">Issues Log</h4>
+                                <div class="data-tables datatable-primary">
+                                    <div id="my_table">
+                                        <table id="dataTable2" class="text-center">
+                                            <thead class="text-capitalize">
+                                                <tr>
+                                                    <th>Facility</th>
+                                                    <th>Type</th>
+                                                    <th>Issue</th>
+                                                    <th>Priority</th>
+                                                    <th>Date Submitted</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $il = mysqli_query($conn, "SELECT * from issue");
+                                                while ($li_row = mysqli_fetch_array($il)) {   
+                                                $status = $li_row['status'];                                         
+                                                ?>
+                                                <tr <?php
+                                                    if ($status == 0) {
+                                                        } elseif ($status == 1) {
+                                                            echo 'style="background: #f49b42"';
+                                                        }elseif ($status == 2) {
+                                                            echo 'style="background: #d3dae5"';
+                                                        }
+                                                ?>>
+                                                    <td><?php echo $li_row['facility'] ; ?></td>
+                                                    <td><?php echo $li_row['issue_type'] ; ?></td>
+                                                    <td><?php echo $li_row['issue'] ; ?></td>
+                                                    <td><?php echo $li_row['priority'] ; ?></td>
+                                                    <td><?php echo $li_row['issue_date'] ; ?></td>
+                                                    <td>
+                                                        <?php 
+                                                        if ($status == 0) {
+                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-success donebtn">Done</button><br>';
+                                                            echo '<button id="'.$li_row["issue_id"].'" class="btn btn-xs btn-secondary naibtn">Not an Issue</button>';
+                                                        } elseif ($status == 1) {
+                                                            echo '<button id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#'.$li_row['issue_id'].'" class=" btn-xs btn btn-primary confirmedbtn">Confirmed</button><br>';
+                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-secondary reobtn">Reopen</button><br>';
+                                                        } elseif ($status == 2) {
+                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-secondary reobtn">Reopen</button><br>';
+                                                        }
+                                                        ?>
+                                                    </td>
+                                                </tr>
+
+                                            <!-- Large modal start -->
+                                            <!-- Large modal -->
+                                            <div id="<?php echo $li_row['issue_id']; ?>" class="modal fade bd-example-modal-lg">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Confirm Issue <?php echo $li_row['issue_id'] ; ?> Has Been Solved</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="container">
+                                                                <div class="">
+                                                                    <form method="post" action="" name="issue_form" id="issue_form" enctype="multipart/form-data">
+                                                                        <div class="login-form-body">
+                                                                            <div class="row"> 
+                                                                                <div class="col-sm-4">           
+                                                                                    <div class="form-gp">
+                                                                                        <h4 class="header-title mb-0">Resolution Comments</h4>
+                                                                                        <p><?php echo $li_row['comments'] ; ?></p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">           
+                                                                                    <div class="form-gp">
+                                                                                        <h4 class="header-title mb-0">Info Relayed To</h4>
+                                                                                        <input type="text" name="irt" id="irt">
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-sm-4">           
+                                                                                    <div class="form-gp">
+                                                                                        <h4 class="header-title mb-0">Info Medium</h4>
+                                                                                        <input type="text" name="im" id="im">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <input type="Submit" name="submit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Large modal modal end -->
+                                            <?php } ?>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <!-- Primary table end -->
+
+                    <!-- Large modal start -->
+                    <!-- Large modal -->
+                    <div class="newissue modal fade bd-example-modal-lg">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Submit an Issue</h5>
+                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container">
+                                        <div class="">
+                                            <form method="post" action="" name="issue_form" id="issue_form" enctype="multipart/form-data">
+                                                <div class="login-form-body">
+                                                    <div class="row">
+                                                        <div class="col-sm-4">
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Facility</h4>
+                                                                <select name="facility" class="custome-select border-0 pr-3">
+                                                                    <option selected="">Select One</option>
+                                                                    <?php
+                                                                    $fc = mysqli_query($conn, "SELECT * from facility");
+                                                                    while ($fc_row = mysqli_fetch_array($fc)) {
+                                                                        echo '<option value="'.$fc_row['name'].'">'.$fc_row['name'].'</option>';
+                                                                    }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Type</h4>
+                                                                <select name = "type" class="custome-select border-0 pr-3">
+                                                                    <option selected="">Select One</option>
+                                                                    <option value="Issue">Issue</option>
+                                                                    <option value="Request">Request</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">
+                                                            <div class="form-gp">
+                                                                <h4  class="header-title mb-0">Issue Level</h4>
+                                                                <select name="il" id="il" class="custome-select border-0 pr-3">
+                                                                    <option selected="">Select One</option>
+                                                                    <option value="1">Level One</option>
+                                                                    <option value="2">Level Two</option>
+                                                                    <option value="3">Level Three</option>
+                                                                    <option value="4">Level Four</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <h4 class="header-title mb-0">Issue</h4>
+                                                    <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"></textarea>
+                                                    <script>
+                                                        CKEDITOR.replace( 'issue' );
+                                                    </script><br>
+                                                    <div class="row"> 
+                                                        <div class="col-sm-4">           
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Issue Client Reporter</h4>
+                                                                <input type="text" name="icr" id="icr">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">           
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Affected Department(s)</h4>
+                                                                <input type="text" name="ad" id="ad">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4">           
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Priority</h4>
+                                                                <select name="priority" class="custome-select border-0 pr-3">
+                                                                    <option selected="">Select One</option>
+                                                                    <option value="High">High</option>
+                                                                    <option value="Medium">Medium</option>
+                                                                    <option value="Low">Low</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input type="Submit" name="submit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Large modal modal end -->
                 </div>
-                <!-- market value area end -->
-                <!-- row area start -->
-                <div class="row">
-                    <!-- Live Crypto Price area start -->
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="header-title">Live Crypto Price</h4>
-                                <div class="cripto-live mt-5">
-                                    <ul>
-                                        <li>
-                                            <div class="icon b">b</div> Bitcoin<span><i class="fa fa-long-arrow-up"></i>$876909.00</span></li>
-                                        <li>
-                                            <div class="icon l">l</div> Litecoin<span><i class="fa fa-long-arrow-up"></i>$29780.00</span></li>
-                                        <li>
-                                            <div class="icon d">d</div> Dashcoin<span><i class="fa fa-long-arrow-up"></i>$13276.00</span></li>
-                                        <li>
-                                            <div class="icon b">b</div> Bitcoindash<span><i class="fa fa-long-arrow-down"></i>$5684.890</span></li>
-                                        <li>
-                                            <div class="icon e">e</div> Euthorium<span><i class="fa fa-long-arrow-down"></i>$3890.98</span></li>
-                                        <li>
-                                            <div class="icon t">b</div> Tcoin<span><i class="fa fa-long-arrow-up"></i>$750.789</span></li>
-                                        <li>
-                                            <div class="icon b">b</div> Bitcoin<span><i class="fa fa-long-arrow-up"></i>$325.037</span></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Live Crypto Price area end -->
-                    <!-- trading history area start -->
-                    <div class="col-lg-8 mt-sm-30 mt-xs-30">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-sm-flex justify-content-between align-items-center">
-                                    <h4 class="header-title">Trading History</h4>
-                                    <div class="trd-history-tabs">
-                                        <ul class="nav" role="tablist">
-                                            <li>
-                                                <a class="active" data-toggle="tab" href="#buy_order" role="tab">Buy Order</a>
-                                            </li>
-                                            <li>
-                                                <a data-toggle="tab" href="#sell_order" role="tab">Sell Order</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    <select class="custome-select border-0 pr-3">
-                                        <option selected>Last 24 Hours</option>
-                                        <option value="0">01 July 2018</option>
-                                    </select>
-                                </div>
-                                <div class="trad-history mt-4">
-                                    <div class="tab-content" id="myTabContent">
-                                        <div class="tab-pane fade show active" id="buy_order" role="tabpanel">
-                                            <div class="table-responsive">
-                                                <table class="dbkit-table">
-                                                    <tr class="heading-td">
-                                                        <td>Trading ID</td>
-                                                        <td>Time</td>
-                                                        <td>Status</td>
-                                                        <td>Amount</td>
-                                                        <td>Last Trade</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>78211</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$758.90</td>
-                                                        <td>$05245.090</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>782782</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$77878.90</td>
-                                                        <td>$7778.090</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>89675978</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$0768.90</td>
-                                                        <td>$0945.090</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane fade" id="sell_order" role="tabpanel">
-                                            <div class="table-responsive">
-                                                <table class="dbkit-table">
-                                                    <tr class="heading-td">
-                                                        <td>Trading ID</td>
-                                                        <td>Time</td>
-                                                        <td>Status</td>
-                                                        <td>Amount</td>
-                                                        <td>Last Trade</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>8964978</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$445.90</td>
-                                                        <td>$094545.090</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>89675978</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$78.90</td>
-                                                        <td>$074852945.090</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>78527878</td>
-                                                        <td>4.00 AM</td>
-                                                        <td>Pending</td>
-                                                        <td>$0768.90</td>
-                                                        <td>$65465.090</td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- trading history area end -->
-                </div>
-                <!-- row area end -->
-                <div class="row mt-5">
-                    <!-- latest news area start -->
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="header-title">Latest News</h4>
-                                <div class="letest-news mt-5">
-                                    <div class="single-post mb-xs-40 mb-sm-40">
-                                        <div class="lts-thumb">
-                                            <img src="assets/images/blog/post-thumb1.jpg" alt="post thumb">
-                                        </div>
-                                        <div class="lts-content">
-                                            <span>Admin Post</span>
-                                            <h2><a href="blog.html">Sed ut perspiciatis unde omnis iste.</a></h2>
-                                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some...</p>
-                                        </div>
-                                    </div>
-                                    <div class="single-post">
-                                        <div class="lts-thumb">
-                                            <img src="assets/images/blog/post-thumb2.jpg" alt="post thumb">
-                                        </div>
-                                        <div class="lts-content">
-                                            <span>Admin Post</span>
-                                            <h2><a href="blog.html">Sed ut perspiciatis unde omnis iste.</a></h2>
-                                            <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some...</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- latest news area end -->
-                    <!-- exchange area start -->
-                    <div class="col-xl-6 mt-md-30 mt-xs-30 mt-sm-30">
-                        <div class="card">
-                            <div class="card-body">
-                                <h4 class="header-title">Exchange</h4>
-                                <div class="exhcange-rate mt-5">
-                                    <form action="#">
-                                        <div class="input-form">
-                                            <input type="text" value="0.76834">
-                                            <span>BTC</span>
-                                        </div>
-                                        <div class="exchange-devider">To</div>
-                                        <div class="input-form">
-                                            <input type="text" value="5689.846">
-                                            <span>USD</span>
-                                        </div>
-                                        <div class="exchange-btn">
-                                            <button type="submit">Exchange Now</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- exchange area end -->
-                </div>
-                <!-- row area start-->
             </div>
         </div>
         <!-- main content area end -->
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved. Template by <a href="https://colorlib.com/wp/">Colorlib</a>.</p>
+                <p>© Copyright 2018. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->
@@ -621,20 +500,62 @@ checkUserSession();
     <script src="assets/js/jquery.slimscroll.min.js"></script>
     <script src="assets/js/jquery.slicknav.min.js"></script>
 
-    <!-- start chart js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
-    <!-- start highcharts js -->
-    <script src="https://code.highcharts.com/highcharts.js"></script>
-    <!-- start zingchart js -->
-    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
-    <script>
-    zingchart.MODULESDIR = "https://cdn.zingchart.com/modules/";
-    ZC.LICENSE = ["569d52cefae586f634c54f86dc99e6a9", "ee6b7db5b51705a13dc2339db3edaf6d"];
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('.donebtn').click(function(){
+                $(this).attr('disabled', 'true');
+                var issue_id = $(this).attr('id');
+                var datastring = 'issue_id='+issue_id;
+
+                $.ajax({
+                    url: 'ajax/done.php',
+                    method: 'post',
+                    data: datastring,
+                    success: function(msg){
+                        $('.donebtn').removeAttr('disabled');
+                        alert('Issue Marked As Done');
+                    }
+                });
+            });
+
+            $('.naibtn').click(function(){
+                $(this).attr('disabled', 'true');
+                var issue_id = $(this).attr('id');
+                var datastring = 'issue_id='+issue_id;
+
+                $.ajax({
+                    url: 'ajax/nan.php',
+                    method: 'post',
+                    data: datastring,
+                    success: function(msg){
+                        $('.naibtn').removeAttr('disabled');
+                        alert('Issue Marked As Not an Issue');
+                    }
+                });
+            });
+
+            $('.reobtn').click(function(){
+                $(this).attr('disabled', 'true');
+                var issue_id = $(this).attr('id');
+                var datastring = 'issue_id='+issue_id;
+
+                $.ajax({
+                    url: 'ajax/reo.php',
+                    method: 'post',
+                    data: datastring,
+                    success: function(msg){
+                        $('.reobtn').removeAttr('disabled');
+                        alert('Issue Reopened');
+                    }
+                });
+            });
+        });
     </script>
-    <!-- all line chart activation -->
-    <script src="assets/js/line-chart.js"></script>
-    <!-- all pie chart -->
-    <script src="assets/js/pie-chart.js"></script>
+
+    <!-- Start datatable js -->
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
