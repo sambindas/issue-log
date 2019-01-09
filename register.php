@@ -16,7 +16,7 @@ header("Location: index.php");
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Sign up - eLaundry</title>
+    <title>Sign up - Issue Log</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -48,7 +48,7 @@ header("Location: index.php");
                 <form action="javascript:;">
                     <div class="login-form-head">
                         <h4>Sign up</h4>
-                        <p>Hello there, Sign up to use eLaundry</p><br>
+                        <p>Hello there, Sign up to use Issue Log</p><br>
                         <p id="formErr"></p>
                     </div>
                     <div class="login-form-body">

@@ -5,24 +5,11 @@ require 'connection.php';
 require 'functions.php';
 checkUserSession();
 
+$protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
-if (isset($_POST['submit_issue'])) {
-    $facility = $_POST['facility'];
-    $type = $_POST['type'];
-    $il = $_POST['il'];
-    $issue = $_POST['issue'];
-    $icr = $_POST['icr'];
-    $ad = $_POST['ad'];
-    $so = $_SESSION['name'];
-    $priority = $_POST['priority'];
-    $date = date('d-m-Y');
+$url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
-        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, issue_client_reporter, affected_dept, support_officer, priority, status)
-         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$icr', '$ad', '$so', '$priority', 0)");
-
-        $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully.</span>';
-
-    }
+$noww = date('M Y');
 
 ?>
 
@@ -53,6 +40,7 @@ if (isset($_POST['submit_issue'])) {
     <link rel="stylesheet" href="assets/css/default-css.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="jquery.datetimepicker.css">
 <script type="text/javascript" src="assets/ckeditor/ckeditor.js"></script>
     <!-- modernizr css -->
     <script src="assets/js/vendor/modernizr-2.8.3.min.js"></script>
@@ -92,7 +80,7 @@ if (isset($_POST['submit_issue'])) {
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="#">Message</a>
                                 <a class="dropdown-item" href="#">Settings</a>
-                                <a class="dropdown-item" href="#">Log Out</a>
+                                <a class="dropdown-item" href="logout.php">Log Out</a>
                             </div>
                         </div>
                     </div>
@@ -105,73 +93,381 @@ if (isset($_POST['submit_issue'])) {
                     <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title">Issues Log</h4>
+                                <h4 class="header-title">Issues Log for <?php echo date('M Y'); ?></h4>
+                                <button class="btn btn-primary btn-flat" id="filters">Filter</button><br><Br>
+                                <form method='post' enctype='multipart/form-data' action='processing.php'>
+                                                                <div class='file_upload' id='f1'><input name='media[]' type='file'/>1</div>
+                                                                <div id='file_tools'>
+                                                                    <img src='images/file_add.png' id='add_file' title='Add new input'/>
+                                                                    <img src='images/file_del.png' id='del_file' title='Delete'/>
+                                                                </div>
+                                                                <input type='submit' name='submit_media' value='Upload'/>
+                                                            </form>
+                                <form id="filterid" style="display: none;">
+                                    <input type="text" id="datetimepicker1" placeholder="From" name="date1">
+                                </form><br>
                                 <div class="data-tables datatable-primary">
                                     <div id="my_table">
                                         <table id="dataTable2" class="text-center">
                                             <thead class="text-capitalize">
                                                 <tr>
+                                                    <th>S/N</th>
                                                     <th>Facility</th>
                                                     <th>Type</th>
                                                     <th>Issue</th>
                                                     <th>Priority</th>
-                                                    <th>Date Submitted</th>
+                                                    <th>Submitted By</th>
+                                                    <th>Date Reported</th>
                                                     <th>Actions</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $il = mysqli_query($conn, "SELECT * from issue");
+                                                $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
+                                                $sn = 1;
                                                 while ($li_row = mysqli_fetch_array($il)) {   
-                                                $status = $li_row['status'];                                         
+                                                $status = $li_row['status'];   
+                                                $issue_id = $li_row['issue_id'];    
+                                                $issue = $li_row['issue'];
+
+                                                $date_one = $li_row['issue_date'];
+                                                $date_two = $li_row['resolution_date']; 
+
+                                                $date_onets = strtotime($date_one);
+                                                $date_twots = strtotime($date_two);
+
+                                                $final_date = $date_twots - $date_onets;
+                              
                                                 ?>
                                                 <tr <?php
                                                     if ($status == 0) {
                                                         } elseif ($status == 1) {
                                                             echo 'style="background: #f49b42"';
                                                         }elseif ($status == 2) {
-                                                            echo 'style="background: #d3dae5"';
+                                                            echo 'style="background: #7d998b"';
+                                                        }elseif ($status == 3) {
+                                                            echo 'style="background: #42f45f"';
+                                                        }elseif ($status == 4) {
+                                                            echo 'style="background: #f4e624"';
+                                                        }elseif ($status == 5) {
+                                                            echo 'style="background: #5394ed"';
                                                         }
                                                 ?>>
+                                                    <td><?php echo $sn++; ?></td>
                                                     <td><?php echo $li_row['facility'] ; ?></td>
                                                     <td><?php echo $li_row['issue_type'] ; ?></td>
-                                                    <td><?php echo $li_row['issue'] ; ?></td>
+                                                    <td style="text-align: justify;"><?php echo "$issue" ?></td>
                                                     <td><?php echo $li_row['priority'] ; ?></td>
+                                                    <td><?php echo $li_row['support_officer'] ; ?></td>
                                                     <td><?php echo $li_row['issue_date'] ; ?></td>
                                                     <td>
-                                                        <?php 
+                                                        <?php
                                                         if ($status == 0) {
-                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-success donebtn">Done</button><br>';
-                                                            echo '<button id="'.$li_row["issue_id"].'" class="btn btn-xs btn-secondary naibtn">Not an Issue</button>';
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
+                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#nai'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not an Issue</a>
+                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#noc'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not Clear</a>
+                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#media'.$li_row['issue_id'].'" class="dropdown-item" href="#">Upload Media</a>
+                                                                        </div>
+                                                                    </div>';
                                                         } elseif ($status == 1) {
-                                                            echo '<button id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#'.$li_row['issue_id'].'" class=" btn-xs btn btn-primary confirmedbtn">Confirmed</button><br>';
-                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-secondary reobtn">Reopen</button><br>';
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                            <a data-toggle="modal" data-target="#con'.$li_row['issue_id'].'" class="dropdown-item" href="#">Confirmed</a>
+                                                                            <a data-toggle="modal" data-target="#icm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Incomplete</a>
+                                                                            <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        </div>
+                                                                    </div>';
                                                         } elseif ($status == 2) {
-                                                            echo '<button id="'.$li_row["issue_id"].'" class=" btn-xs btn btn-secondary reobtn">Reopen</button><br>';
-                                                        }
-                                                        ?>
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        </div>
+                                                                    </div>';
+                                                        } elseif ($status == 3) {
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <a data-toggle="modal" data-target="#sum'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Summary</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        </div>
+                                                                    </div>';                                                            
+                                                        } elseif ($status == 4) {
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                            <a data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
+                                                                            <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        </div>
+                                                                    </div>';
+                                                                }
+                                                         elseif ($status == 5) {
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                            <a data-toggle="modal" data-target="#con'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
+                                                                            <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        </div>
+                                                                    </div>';
+                                                                }
+                                                        ?> 
                                                     </td>
+                                                    <td></td>
                                                 </tr>
 
-                                            <!-- Large modal start -->
-                                            <!-- Large modal -->
-                                            <div id="<?php echo $li_row['issue_id']; ?>" class="modal fade bd-example-modal-lg">
+                                            <!-- media start -->
+                                            <div class="modal fade bd-example-modal-lg" id="media<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Upload Media</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Upload Media for this issue</p>
+                                                            <form method='post' enctype='multipart/form-data' action='processing.php'>
+                                                                <div class='file_upload' id='f1'><input name='media[]' type='file'/>1</div>
+                                                                <div id='file_tools'>
+                                                                    <img src='images/file_add.png' id='add_file' title='Add new input'/>
+                                                                    <img src='images/file_del.png' id='del_file' title='Delete'/>
+                                                                </div>
+                                                                <input type='submit' name='submit_media' value='Upload'/>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                             <!-- incomplete start -->
+                                            <div class="modal fade bd-example-modal-lg" id="icm<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Mark as Incomplete</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="text" height="500px" width="300px" name="ncomments">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_icm">Mark as Incomplete</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- view summary start -->
+                                            <div class="modal fade bd-example-modal-lg" id="sum<?php echo $li_row['issue_id']; ?>">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Confirm Issue <?php echo $li_row['issue_id'] ; ?> Has Been Solved</h5>
+                                                            <h5 class="modal-title">Summary of this Issue</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p><b>Facility:</b> <?php echo $li_row['facility']; ?></p>
+                                                            <p><b>Type:</b> <?php echo $li_row['issue_type']; ?></p>
+                                                            <p><b>Level:</b> <?php echo $li_row['issue_level']; ?></p>
+                                                            <p><b>priotity:</b> <?php echo $li_row['priority']; ?></p>
+                                                            <p><b>Issue:</b> <?php echo $li_row['issue']; ?></p>
+                                                            <p><b>Issue reported on:</b> <?php echo $li_row['issue_reported_on'] .' by '. $li_row['issue_client_reporter']; ?></p>
+                                                            <p><b>Submitted by:</b> <?php echo $li_row['support_officer'] .' on '. $li_row['issue_date']; ?></p>
+                                                            <p><b>Resolved by:</b> <?php echo $li_row['resolved_by'] .' on '. $li_row['resolution_date']; ?></p>
+                                                            <p><b>Info Relayed to:</b> <?php echo $li_row['info_relayed_to'] .' by '. $li_row['info_medium']; ?></p>
+                                                            <p><b>Issue was resolved in:</b> <?php echo secondsToTime($final_date); ?></p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- not clear start -->
+                                            <div class="modal fade bd-example-modal-lg" id="noc<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Mark as Not Clear</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="text" height="500px" width="300px" name="ncomments">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_noc">Mark as Not Clear</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- not an issue modal start -->
+                                            <div class="modal fade bd-example-modal-sm" id="nai<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Add Additional Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="text" name="ncomments">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_nai">Mark as Not an Issue</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- comments modal start -->
+
+                                            <div class="modal fade bd-example-modal-sm" id="comments<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">View Issue Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <?php
+                                                                $commentsq = mysqli_query($conn, "SELECT * from comments where issue_id = '$issue_id'");
+                                                                if (mysqli_num_rows($commentsq) >= 1) {
+                                                                while ($cq = mysqli_fetch_array($commentsq)) {
+                                                                    $sstatus = $cq['status'];
+                                                                    if ($sstatus == 0) {
+                                                                        echo '<b>'.$cq['user'].' - (Reopened):</b> '.$cq['comment'].'<br>'; 
+                                                                    } elseif ($sstatus == 1) {
+                                                                        echo '<b>'.$cq['user'].' - (Done):</b> '.$cq['comment'].'<br>'; 
+                                                                    } elseif ($sstatus == 2) {
+                                                                        echo '<b>'.$cq['user'].' - (Not An Issue):</b> '.$cq['comment'].'<br>'; 
+                                                                    } elseif ($sstatus == 4) {
+                                                                        echo '<b>'.$cq['user'].' - (Incomplete):</b> '.$cq['comment'].'<br>'; 
+                                                                    } elseif ($sstatus == 5) {
+                                                                        echo '<b>'.$cq['user'].' - (Not Clear):</b> '.$cq['comment'].'<br>'; 
+                                                                    }
+                                                                }
+                                                            }else {
+                                                                echo "<p>No Comments For This Issue</p>";
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- done modal start -->
+                                            <div class="modal fade bd-example-modal-sm" id="done<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Add Additional Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="text" name="dcomments">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_done">Mark as Done</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- reopen modal start -->
+                                            <div class="modal fade bd-example-modal-sm" id="reo<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Add Additional Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="text" name="rcomments">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_reo">Mark as Reopened</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- Large modal start -->
+                                            <div id="con<?php echo $li_row['issue_id']; ?>" class="modal fade bd-example-modal-lg">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Confirm Issue <?php echo $sn-1; ?> Has Been Solved</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             <div class="container">
                                                                 <div class="">
-                                                                    <form method="post" action="" name="issue_form" id="issue_form" enctype="multipart/form-data">
+                                                                    <form method="post" action="processing.php" id="issue_form" enctype="multipart/form-data">
                                                                         <div class="login-form-body">
                                                                             <div class="row"> 
                                                                                 <div class="col-sm-4">           
                                                                                     <div class="form-gp">
-                                                                                        <h4 class="header-title mb-0">Resolution Comments</h4>
-                                                                                        <p><?php echo $li_row['comments'] ; ?></p>
+                                                                                        <h4 class="header-title mb-0">Resolved By</h4>
+                                                                                        <p><?php echo $li_row['resolved_by'] .'<br>'. $li_row['resolution_date'] ; ?></p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-4">           
@@ -180,6 +476,8 @@ if (isset($_POST['submit_issue'])) {
                                                                                         <input type="text" name="irt" id="irt">
                                                                                     </div>
                                                                                 </div>
+                                                                                <input type="hidden" name="issue_id" value="<?php echo $issue_id; ?>">
+                                                                                <input type="hidden" name="url" value="<?php echo $url; ?>">
                                                                                 <div class="col-sm-4">           
                                                                                     <div class="form-gp">
                                                                                         <h4 class="header-title mb-0">Info Medium</h4>
@@ -188,7 +486,7 @@ if (isset($_POST['submit_issue'])) {
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-                                                                        <input type="Submit" name="submit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
+                                                                        <input type="Submit" name="confirmed" value="Confirmed" style="float: right;" class="btn btn-primary">
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -219,13 +517,13 @@ if (isset($_POST['submit_issue'])) {
                                 <div class="modal-body">
                                     <div class="container">
                                         <div class="">
-                                            <form method="post" action="" name="issue_form" id="issue_form" enctype="multipart/form-data">
+                                            <form method="post" action="processing.php" name="issue_form" id="issue_form" enctype="multipart/form-data">
                                                 <div class="login-form-body">
                                                     <div class="row">
                                                         <div class="col-sm-4">
                                                             <div class="form-gp">
                                                                 <h4 class="header-title mb-0">Facility</h4>
-                                                                <select name="facility" class="custome-select border-0 pr-3">
+                                                                <select name="facility" class="custome-select border-0 pr-3" required>
                                                                     <option selected="">Select One</option>
                                                                     <?php
                                                                     $fc = mysqli_query($conn, "SELECT * from facility");
@@ -239,7 +537,7 @@ if (isset($_POST['submit_issue'])) {
                                                         <div class="col-sm-4">
                                                             <div class="form-gp">
                                                                 <h4 class="header-title mb-0">Type</h4>
-                                                                <select name = "type" class="custome-select border-0 pr-3">
+                                                                <select name = "type" class="custome-select border-0 pr-3" required>
                                                                     <option selected="">Select One</option>
                                                                     <option value="Issue">Issue</option>
                                                                     <option value="Request">Request</option>
@@ -249,7 +547,7 @@ if (isset($_POST['submit_issue'])) {
                                                         <div class="col-sm-4">
                                                             <div class="form-gp">
                                                                 <h4  class="header-title mb-0">Issue Level</h4>
-                                                                <select name="il" id="il" class="custome-select border-0 pr-3">
+                                                                <select name="il" id="il" class="custome-select border-0 pr-3" required>
                                                                     <option selected="">Select One</option>
                                                                     <option value="1">Level One</option>
                                                                     <option value="2">Level Two</option>
@@ -265,27 +563,34 @@ if (isset($_POST['submit_issue'])) {
                                                         CKEDITOR.replace( 'issue' );
                                                     </script><br>
                                                     <div class="row"> 
-                                                        <div class="col-sm-4">           
+                                                        <div class="col-sm-3">           
                                                             <div class="form-gp">
                                                                 <h4 class="header-title mb-0">Issue Client Reporter</h4>
-                                                                <input type="text" name="icr" id="icr">
+                                                                <input type="text" name="icr" id="icr" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-4">           
+                                                        <input type="hidden" name="url" value="<?php echo $url; ?>">
+                                                        <div class="col-sm-3">           
                                                             <div class="form-gp">
                                                                 <h4 class="header-title mb-0">Affected Department(s)</h4>
-                                                                <input type="text" name="ad" id="ad">
+                                                                <input type="text" name="ad" id="ad" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-4">           
+                                                        <div class="col-sm-3">           
                                                             <div class="form-gp">
                                                                 <h4 class="header-title mb-0">Priority</h4>
-                                                                <select name="priority" class="custome-select border-0 pr-3">
+                                                                <select name="priority" class="custome-select border-0 pr-3" required>
                                                                     <option selected="">Select One</option>
                                                                     <option value="High">High</option>
                                                                     <option value="Medium">Medium</option>
                                                                     <option value="Low">Low</option>
                                                                 </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-3">           
+                                                            <div class="form-gp">
+                                                                <h4 class="header-title mb-0">Issue Reported On</h4>
+                                                                <input type="text" id="datetimepicker" name="iro">
                                                             </div>
                                                         </div>
                                                     </div>
@@ -312,184 +617,6 @@ if (isset($_POST['submit_issue'])) {
         <!-- footer area end-->
     </div>
     <!-- page container area end -->
-    <!-- offset area start -->
-    <div class="offset-area">
-        <div class="offset-close"><i class="ti-close"></i></div>
-        <ul class="nav offset-menu-tab">
-            <li><a class="active" data-toggle="tab" href="#activity">Activity</a></li>
-            <li><a data-toggle="tab" href="#settings">Settings</a></li>
-        </ul>
-        <div class="offset-content tab-content">
-            <div id="activity" class="tab-pane fade in show active">
-                <div class="recent-activity">
-                    <div class="timeline-task">
-                        <div class="icon bg1">
-                            <i class="fa fa-envelope"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Rashed sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg2">
-                            <i class="fa fa-check"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Added</h4>
-                            <span class="time"><i class="ti-time"></i>7 Minutes Ago</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg2">
-                            <i class="fa fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>You missed you Password!</h4>
-                            <span class="time"><i class="ti-time"></i>09:20 Am</span>
-                        </div>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg3">
-                            <i class="fa fa-bomb"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Member waiting for you Attention</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg3">
-                            <i class="ti-signal"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>You Added Kaji Patha few minutes ago</h4>
-                            <span class="time"><i class="ti-time"></i>01 minutes ago</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg1">
-                            <i class="fa fa-envelope"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Ratul Hamba sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Hello sir , where are you, i am egerly waiting for you.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg2">
-                            <i class="fa fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Rashed sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg2">
-                            <i class="fa fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Rashed sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg3">
-                            <i class="fa fa-bomb"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Rashed sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                    <div class="timeline-task">
-                        <div class="icon bg3">
-                            <i class="ti-signal"></i>
-                        </div>
-                        <div class="tm-title">
-                            <h4>Rashed sent you an email</h4>
-                            <span class="time"><i class="ti-time"></i>09:35</span>
-                        </div>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Esse distinctio itaque at.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div id="settings" class="tab-pane fade">
-                <div class="offset-settings">
-                    <h4>General Settings</h4>
-                    <div class="settings-list">
-                        <div class="s-settings">
-                            <div class="s-sw-title">
-                                <h5>Notifications</h5>
-                                <div class="s-swtich">
-                                    <input type="checkbox" id="switch1" />
-                                    <label for="switch1">Toggle</label>
-                                </div>
-                            </div>
-                            <p>Keep it 'On' When you want to get all the notification.</p>
-                        </div>
-                        <div class="s-settings">
-                            <div class="s-sw-title">
-                                <h5>Show recent activity</h5>
-                                <div class="s-swtich">
-                                    <input type="checkbox" id="switch2" />
-                                    <label for="switch2">Toggle</label>
-                                </div>
-                            </div>
-                            <p>The for attribute is necessary to bind our custom checkbox with the input.</p>
-                        </div>
-                        <div class="s-settings">
-                            <div class="s-sw-title">
-                                <h5>Show your emails</h5>
-                                <div class="s-swtich">
-                                    <input type="checkbox" id="switch3" />
-                                    <label for="switch3">Toggle</label>
-                                </div>
-                            </div>
-                            <p>Show email so that easily find you.</p>
-                        </div>
-                        <div class="s-settings">
-                            <div class="s-sw-title">
-                                <h5>Show Task statistics</h5>
-                                <div class="s-swtich">
-                                    <input type="checkbox" id="switch4" />
-                                    <label for="switch4">Toggle</label>
-                                </div>
-                            </div>
-                            <p>The for attribute is necessary to bind our custom checkbox with the input.</p>
-                        </div>
-                        <div class="s-settings">
-                            <div class="s-sw-title">
-                                <h5>Notifications</h5>
-                                <div class="s-swtich">
-                                    <input type="checkbox" id="switch5" />
-                                    <label for="switch5">Toggle</label>
-                                </div>
-                            </div>
-                            <p>Use checkboxes when looking for yes or no answers.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- offset area end -->
     <!-- jquery latest version -->
     <script src="assets/js/vendor/jquery-2.2.4.min.js"></script>
     <!-- bootstrap 4 js -->
@@ -502,63 +629,82 @@ if (isset($_POST['submit_issue'])) {
 
     <script type="text/javascript">
         $(document).ready(function(){
-            $('.donebtn').click(function(){
-                $(this).attr('disabled', 'true');
-                var issue_id = $(this).attr('id');
-                var datastring = 'issue_id='+issue_id;
-
-                $.ajax({
-                    url: 'ajax/done.php',
-                    method: 'post',
-                    data: datastring,
-                    success: function(msg){
-                        $('.donebtn').removeAttr('disabled');
-                        alert('Issue Marked As Done');
-                    }
-                });
+            jQuery('#datetimepicker').datetimepicker();
+            $('#filters').click(function(){
+                    $('#filterid').toggle();
             });
-
-            $('.naibtn').click(function(){
-                $(this).attr('disabled', 'true');
-                var issue_id = $(this).attr('id');
-                var datastring = 'issue_id='+issue_id;
-
-                $.ajax({
-                    url: 'ajax/nan.php',
-                    method: 'post',
-                    data: datastring,
-                    success: function(msg){
-                        $('.naibtn').removeAttr('disabled');
-                        alert('Issue Marked As Not an Issue');
-                    }
-                });
-            });
-
-            $('.reobtn').click(function(){
-                $(this).attr('disabled', 'true');
-                var issue_id = $(this).attr('id');
-                var datastring = 'issue_id='+issue_id;
-
-                $.ajax({
-                    url: 'ajax/reo.php',
-                    method: 'post',
-                    data: datastring,
-                    success: function(msg){
-                        $('.reobtn').removeAttr('disabled');
-                        alert('Issue Reopened');
-                    }
-                });
+            jQuery('#datetimepicker1').datetimepicker({
+             i18n:{
+              de:{
+               months:[
+                'January','February','March','April',
+                'May','June','July','August',
+                'September','October','November','December',
+               ],
+               dayOfWeek:[
+                "Su.", "Mo", "Tu", "We", 
+                "Th", "Fr", "Sa.",
+               ]
+              }
+             },
+             timepicker:false,
+             format:'d/m/Y'
             });
         });
     </script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var maxField = 10; //Input fields increment limitation
+            var addButton = $('.add_button'); //Add button selector
+            var wrapper = $('.field_wrapper'); //Input field wrapper
+            var fieldHTML = '<div><input type="file" name="media[]"><a href="javascript:void(0);" class="remove_button">Remove</a></div>'; //New input field html 
+            var x = 1; //Initial field counter is 1
+            
+            //Once add button is clicked
+            $(addButton).click(function(){
+                //Check maximum number of input fields
+                if(x < maxField){ 
+                    x++; //Increment field counter
+                    $(wrapper).append(fieldHTML); //Add field html
+                }
+            });
+            
+            //Once remove button is clicked
+            $(wrapper).on('click', '.remove_button', function(e){
+                e.preventDefault();
+                $(this).parent('div').remove(); //Remove field html
+                x--; //Decrement field counter
+            });
+        });
+    </script>
+    <script type='text/javascript'>
+$(document).ready(function(){
+    var counter = 2;
+    $('#del_file').hide();
+    $('img#add_file').click(function(){
+        $('#file_tools').before('<div class="file_upload" id="f'+counter+'"><input name="media[]" type="file">'+counter+'</div>');
+        $('#del_file').fadeIn(0);
+    counter++;
+    });
+    $('img#del_file').click(function(){
+        if(counter==3){
+            $('#del_file').hide();
+        }   
+        counter--;
+        $('#f'+counter).remove();
+    });
+});
+</script>
 
     <!-- Start datatable js -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
-</body>
+    <script src="jquery.datetimepicker.full.min.js"></script>
+    <script src="jquery.datetimepicker.js"></script>
 
 </html>
