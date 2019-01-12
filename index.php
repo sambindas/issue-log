@@ -95,14 +95,6 @@ $noww = date('M Y');
                             <div class="card-body">
                                 <h4 class="header-title">Issues Log for <?php echo date('M Y'); ?></h4>
                                 <button class="btn btn-primary btn-flat" id="filters">Filter</button><br><Br>
-                                <form method='post' enctype='multipart/form-data' action='processing.php'>
-                                                                <div class='file_upload' id='f1'><input name='media[]' type='file'/>1</div>
-                                                                <div id='file_tools'>
-                                                                    <img src='images/file_add.png' id='add_file' title='Add new input'/>
-                                                                    <img src='images/file_del.png' id='del_file' title='Delete'/>
-                                                                </div>
-                                                                <input type='submit' name='submit_media' value='Upload'/>
-                                                            </form>
                                 <form id="filterid" style="display: none;">
                                     <input type="text" id="datetimepicker1" placeholder="From" name="date1">
                                 </form><br>
@@ -152,6 +144,8 @@ $noww = date('M Y');
                                                             echo 'style="background: #f4e624"';
                                                         }elseif ($status == 5) {
                                                             echo 'style="background: #5394ed"';
+                                                        }elseif ($status == 6) {
+                                                            echo 'style="background: #42ebf4"';
                                                         }
                                                 ?>>
                                                     <td><?php echo $sn++; ?></td>
@@ -169,13 +163,17 @@ $noww = date('M Y');
                                                                         Action
                                                                         </button>
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
-                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#nai'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not an Issue</a>
-                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#noc'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not Clear</a>
-                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                            <a data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
+                                                                            <a data-toggle="modal" data-target="#nai'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not an Issue</a>
+                                                                            <a data-toggle="modal" data-target="#noc'.$li_row['issue_id'].'" class="dropdown-item" href="#">Not Clear</a>
+                                                                            <a data-toggle="modal" data-target="#req'.$li_row['issue_id'].'" class="dropdown-item" href="#">Requires Approval</a>
                                                                         <div class="dropdown-divider"></div>
-                                                                            <a id="'.$li_row["issue_id"].'" data-toggle="modal" data-target="#media'.$li_row['issue_id'].'" class="dropdown-item" href="#">Upload Media</a>
-                                                                        </div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>                                                                        </div>
                                                                     </div>';
                                                         } elseif ($status == 1) {
                                                             echo '  <div class="dropdown">
@@ -186,7 +184,11 @@ $noww = date('M Y');
                                                                             <a data-toggle="modal" data-target="#con'.$li_row['issue_id'].'" class="dropdown-item" href="#">Confirmed</a>
                                                                             <a data-toggle="modal" data-target="#icm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Incomplete</a>
                                                                             <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
                                                         } elseif ($status == 2) {
@@ -196,7 +198,11 @@ $noww = date('M Y');
                                                                         </button>
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
                                                         } elseif ($status == 3) {
@@ -206,6 +212,8 @@ $noww = date('M Y');
                                                                         </button>
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                         <a data-toggle="modal" data-target="#sum'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Summary</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         </div>
                                                                     </div>';                                                            
@@ -217,7 +225,11 @@ $noww = date('M Y');
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                             <a data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
                                                                             <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -227,9 +239,27 @@ $noww = date('M Y');
                                                                         Action
                                                                         </button>
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                            <a data-toggle="modal" data-target="#con'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
+                                                                            <a data-toggle="modal" data-target="#done'.$li_row['issue_id'].'" class="dropdown-item" href="#">Done</a>
                                                                             <a data-toggle="modal" data-target="#reo'.$li_row['issue_id'].'" class="dropdown-item" href="#">Reopen</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
+                                                                        </div>
+                                                                    </div>';
+                                                                }
+                                                         elseif ($status == 6) {
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                            <a data-toggle="modal" data-target="#app'.$li_row['issue_id'].'" class="dropdown-item" href="#">Approved</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -264,9 +294,33 @@ $noww = date('M Y');
                                             </div>
                                             <!-- Small modal modal end -->
 
+                                             <!-- requires approval start -->
+                                            <div class="modal fade" id="req<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Requires Approval</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Additional Comments If Available</p>
+                                                            <form method="post" action="processing.php">
+                                                                <textarea type="text" name="ncomments"></textarea>
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_req">Mark</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
                                              <!-- incomplete start -->
-                                            <div class="modal fade bd-example-modal-lg" id="icm<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                            <div class="modal fade" id="icm<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Mark as Incomplete</h5>
@@ -275,7 +329,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" height="500px" width="300px" name="ncomments">
+                                                                <textarea type="text" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_icm">Mark as Incomplete</button>
@@ -316,8 +370,8 @@ $noww = date('M Y');
                                             <!-- Small modal modal end -->
 
                                             <!-- not clear start -->
-                                            <div class="modal fade bd-example-modal-lg" id="noc<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                            <div class="modal fade" id="noc<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Mark as Not Clear</h5>
@@ -326,7 +380,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" height="500px" width="300px" name="ncomments">
+                                                                <textarea type="text" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_noc">Mark as Not Clear</button>
@@ -340,8 +394,8 @@ $noww = date('M Y');
                                             <!-- Small modal modal end -->
 
                                             <!-- not an issue modal start -->
-                                            <div class="modal fade bd-example-modal-sm" id="nai<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                            <div class="modal fade" id="nai<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Add Additional Comments</h5>
@@ -350,7 +404,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" name="ncomments">
+                                                                <textarea type="text" name="ncomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_nai">Mark as Not an Issue</button>
@@ -364,9 +418,33 @@ $noww = date('M Y');
                                             <!-- Small modal modal end -->
 
                                             <!-- comments modal start -->
+                                            <div class="modal fade" id="comm<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Add Comments</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Add Comments to this Issue</p>
+                                                            <form method="post" action="processing.php">
+                                                                <textarea type="text" name="comments" required></textarea>
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_comm">Submit</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- comments modal start -->
 
                                             <div class="modal fade bd-example-modal-sm" id="comments<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                                <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">View Issue Comments</h5>
@@ -379,15 +457,17 @@ $noww = date('M Y');
                                                                 while ($cq = mysqli_fetch_array($commentsq)) {
                                                                     $sstatus = $cq['status'];
                                                                     if ($sstatus == 0) {
-                                                                        echo '<b>'.$cq['user'].' - (Reopened):</b> '.$cq['comment'].'<br>'; 
+                                                                        echo '<b>'.$cq['user'].' - (Reopened):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 1) {
-                                                                        echo '<b>'.$cq['user'].' - (Done):</b> '.$cq['comment'].'<br>'; 
+                                                                        echo '<b>'.$cq['user'].' - (Done):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 2) {
-                                                                        echo '<b>'.$cq['user'].' - (Not An Issue):</b> '.$cq['comment'].'<br>'; 
+                                                                        echo '<b>'.$cq['user'].' - (Not An Issue):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 4) {
-                                                                        echo '<b>'.$cq['user'].' - (Incomplete):</b> '.$cq['comment'].'<br>'; 
+                                                                        echo '<b>'.$cq['user'].' - (Incomplete):</b> '.$cq['comment']. ' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 5) {
-                                                                        echo '<b>'.$cq['user'].' - (Not Clear):</b> '.$cq['comment'].'<br>'; 
+                                                                        echo '<b>'.$cq['user'].' - (Not Clear):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                    } else {
+                                                                        echo '<b>'.$cq['user'].' - :</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     }
                                                                 }
                                                             }else {
@@ -403,8 +483,8 @@ $noww = date('M Y');
                                             <!-- Small modal modal end -->
 
                                             <!-- done modal start -->
-                                            <div class="modal fade bd-example-modal-sm" id="done<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                            <div class="modal fade" id="done<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Add Additional Comments</h5>
@@ -413,7 +493,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" name="dcomments">
+                                                                <textarea type="text" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_done">Mark as Done</button>
@@ -426,9 +506,32 @@ $noww = date('M Y');
                                             </div>
                                             <!-- Small modal modal end -->
 
-                                            <!-- reopen modal start -->
-                                            <div class="modal fade bd-example-modal-sm" id="reo<?php echo $li_row['issue_id']; ?>">
+                                            <!-- done modal start -->
+                                            <div class="modal fade" id="app<?php echo $li_row['issue_id']; ?>">
                                                 <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Approve Issue</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Approve this issue?</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_app">Approve</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- reopen modal start -->
+                                            <div class="modal fade" id="reo<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Add Additional Comments</h5>
@@ -437,7 +540,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" name="rcomments">
+                                                                <textarea type="text" name="rcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_reo">Mark as Reopened</button>
@@ -541,6 +644,7 @@ $noww = date('M Y');
                                                                     <option selected="">Select One</option>
                                                                     <option value="Issue">Issue</option>
                                                                     <option value="Request">Request</option>
+                                                                    <option value="Other">Other</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -549,10 +653,10 @@ $noww = date('M Y');
                                                                 <h4  class="header-title mb-0">Issue Level</h4>
                                                                 <select name="il" id="il" class="custome-select border-0 pr-3" required>
                                                                     <option selected="">Select One</option>
-                                                                    <option value="1">Level One</option>
-                                                                    <option value="2">Level Two</option>
-                                                                    <option value="3">Level Three</option>
-                                                                    <option value="4">Level Four</option>
+                                                                    <option value="1">Level One (1 hr - 24 hrs)</option>
+                                                                    <option value="2">Level Two (24 hrs - 1 wk)</option>
+                                                                    <option value="3">Level Three (1 wk - 1mth)</option>
+                                                                    <option value="4">Level Four (TBD)</option>
                                                                 </select>
                                                             </div>
                                                         </div>
@@ -677,24 +781,6 @@ $noww = date('M Y');
             });
         });
     </script>
-    <script type='text/javascript'>
-$(document).ready(function(){
-    var counter = 2;
-    $('#del_file').hide();
-    $('img#add_file').click(function(){
-        $('#file_tools').before('<div class="file_upload" id="f'+counter+'"><input name="media[]" type="file">'+counter+'</div>');
-        $('#del_file').fadeIn(0);
-    counter++;
-    });
-    $('img#del_file').click(function(){
-        if(counter==3){
-            $('#del_file').hide();
-        }   
-        counter--;
-        $('#f'+counter).remove();
-    });
-});
-</script>
 
     <!-- Start datatable js -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>

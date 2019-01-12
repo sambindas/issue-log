@@ -6,7 +6,7 @@ require '../connection.php';
 	$email = $_POST['email'];
 	$password = sha1($_POST['password']);
 
-	$query = mysqli_query($conn, "SELECT * from user where email = '$email' and password = '$password'");
+	$query = mysqli_query($conn, "SELECT * from user where email = '$email' and password = '$password' and status = 1");
 
 
 

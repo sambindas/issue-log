@@ -10,7 +10,7 @@
         <div class="sidebar-menu">
             <div class="sidebar-header">
                 <div class="logo">
-                    <a href="index.html">Issues Log</a>
+                    <a href="index.php">Issues Log</a>
                 </div>
             </div>
             <div class="main-menu">
@@ -27,6 +27,7 @@
                                 <a href="javascript:void(0)" aria-expanded="true"><i class="ti-pie-chart"></i><span>Manage</span></a>
                                 <ul class="collapse">
                                     <li><a href="facility.php">Facilities</a></li>
+                                    <li><a href="user.php">Users</a></li>
                                 </ul>
                             </li>
                         </ul>

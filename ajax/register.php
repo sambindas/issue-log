@@ -9,14 +9,13 @@ require '../connection.php';
 	$phone = mysqli_real_escape_string($conn, $_POST['phone']);
 	$password = sha1($_POST['password']);
 	$token = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 40);
-	$type = 'User';
+	$role = mysqli_real_escape_string($conn, $_POST['role']);
 
-	$query = mysqli_query($conn, "INSERT into user (user_type, user_name, email, phone, password, date_added, token_status) 
-								values ('$type', '$name', '$email', '$phone', '$password', now(), '$token')");
+	$query = mysqli_query($conn, "INSERT into user (user_name, email, phone, password, date_added, token_status, user_role) 
+								values ('$name', '$email', '$phone', '$password', now(), '$token', '$role')");
 
 	if ($query) {
-		$_SESSION['email'] = $email;
-		$_SESSION['name'] = $name;
+		$_SESSION['msg'] = '<span class="alert alert-success">User Registered Successfully</span>';
 		echo "1";
 	} else {
 		echo "0";
