@@ -11,18 +11,6 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 $noww = date('M Y');
 
-$issue_id = $_GET['issue_id'];
-
-$editqq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'");
-$editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'");
-
-while ($t = mysqli_fetch_array($editqq)) {
-    if ($t['support_officer'] != $_SESSION['name'] || $t['status'] == 3) {
-
-     $_SESSION['msg'] = '<span class="alert alert-danger">Cannot Edit Another Users Issue.</span>';
-    header("Location: index.php ");
-}
-}
 
 ?>
 
@@ -32,7 +20,7 @@ while ($t = mysqli_fetch_array($editqq)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>eClinic Issues Log</title>
+    <title>Add an issue</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -64,15 +52,6 @@ while ($t = mysqli_fetch_array($editqq)) {
             require 'sidebar.php';
             require 'header.php';
             ?>
-
-                    <?php
-                    while ($li_row = mysqli_fetch_array($editq)) {
-                        $selected = $li_row['priority'];
-                        $selected1 = $li_row['issue_type'];
-                        $selected2 = $li_row['issue_level'];
-                        $facc = $li_row['facility'];
-
-                    ?>
                     <div class="container">
                         <div class="">
                             <form method="post" action="processing.php" name="issue_form" id="issue_form" enctype="multipart/form-data">
@@ -86,12 +65,9 @@ while ($t = mysqli_fetch_array($editqq)) {
                                                     <?php
                                                     $fc = mysqli_query($conn, "SELECT * from facility");
                                                     while ($fc_row = mysqli_fetch_array($fc)) {
-                                                    
+                                                        echo '<option value="'.$fc_row['code'].'">'.$fc_row['name'].'</option>';
+                                                    }
                                                     ?>
-                                                    <option <?php if ($fc_row['code'] == $facc) {
-                                                        echo "selected";
-                                                    } ?> value="<?php echo $fc_row['code'];?>"><?php echo $fc_row['name'] ?></option>
-                                                <?php } ?>
                                                 </select>
                                             </div>
                                         </div>
@@ -99,10 +75,10 @@ while ($t = mysqli_fetch_array($editqq)) {
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Type</h4>
                                                 <select name = "type" class="custome-select border-0 pr-3" required>
-                                                    <option disabled selected="">Select One</option>
-                                                    <option <?php if($selected1 == "Issue") echo "SELECTED";?> value="Issue">Issue</option>
-                                                    <option <?php if($selected1 == "Request") echo "SELECTED";?> value="Request">Request</option>
-                                                    <option <?php if($selected1 == "Other") echo "SELECTED";?> value="Other">Other</option>
+                                                    <option selected="">Select One</option>
+                                                    <option value="Issue">Issue</option>
+                                                    <option value="Request">Request</option>
+                                                    <option value="Other">Other</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -110,17 +86,17 @@ while ($t = mysqli_fetch_array($editqq)) {
                                             <div class="form-gp">
                                                 <h4  class="header-title mb-0">Issue Level</h4>
                                                 <select name="il" id="il" class="custome-select border-0 pr-3" required>
-                                                    <option disabled selected="">Select One</option>
-                                                    <option <?php if($selected2 == "1") echo "SELECTED";?> value="1">Level One (1 hr - 24 hrs)</option>
-                                                    <option <?php if($selected2 == "2") echo "SELECTED";?> value="2">Level Two (24 hrs - 1 wk)</option>
-                                                    <option <?php if($selected2 == "3") echo "SELECTED";?> value="3">Level Three (1 wk - 1mth)</option>
-                                                    <option <?php if($selected2 == "4") echo "SELECTED";?> value="4">Level Four (TBD)</option>
+                                                    <option selected="">Select One</option>
+                                                    <option value="1">Level One (1 hr - 24 hrs)</option>
+                                                    <option value="2">Level Two (24 hrs - 1 wk)</option>
+                                                    <option value="3">Level Three (1 wk - 1mth)</option>
+                                                    <option value="4">Level Four (TBD)</option>
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
                                     <h4 class="header-title mb-0">Issue</h4>
-                                    <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"><?php echo $li_row['issue'] ?></textarea>
+                                    <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"></textarea>
                                     <script>
                                         CKEDITOR.replace( 'issue' );
                                     </script><br>
@@ -128,43 +104,39 @@ while ($t = mysqli_fetch_array($editqq)) {
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Issue Client Reporter</h4>
-                                                <input type="text" name="icr" id="icr" value="<?php echo $li_row['issue_client_reporter'] ?>" required>
+                                                <input type="text" name="icr" id="icr" required>
                                             </div>
                                         </div>
-                                        <input type="hidden" name="issue_id" value="<?php echo $issue_id; ?>">
                                         <input type="hidden" name="url" value="<?php echo $url; ?>">
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Affected Department(s)</h4>
-                                                <input type="text" name="ad" id="ad" value="<?php echo $li_row['affected_dept'] ?>" required>
+                                                <input type="text" name="ad" id="ad" required>
                                             </div>
                                         </div>
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Priority</h4>
                                                 <select name="priority" class="custome-select border-0 pr-3" required>
-                                                    <option disabled selected="">Select One</option>
-                                                    <option <?php if($selected == "High") echo "SELECTED";?> value="High">High</option>
-                                                    <option <?php if($selected == "Medium") echo "SELECTED";?> value="Medium">Medium</option>
-                                                    <option <?php if($selected == "Low") echo "SELECTED";?> value="Low">Low</option>
+                                                    <option selected="">Select One</option>
+                                                    <option value="High">High</option>
+                                                    <option value="Medium">Medium</option>
+                                                    <option value="Low">Low</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Issue Reported On</h4>
-                                                <input type="text" id="datetimepicker" value="<?php echo $li_row['issue_reported_on'] ?>" name="iro">
+                                                <input type="text" id="datetimepicker" name="iro">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <input type="Submit" name="edit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
+                                <input type="Submit" name="submit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
                             </form>
                         </div>
                     </div>
-                    <?php
-                    }
-                    ?>
                 </div>
             </div>
         </div>

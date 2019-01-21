@@ -40,6 +40,28 @@ $noww = date('M Y');
     <link rel="stylesheet" href="assets/css/default-css.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="fancybox/jquery.fancybox-1.3.4.css" />
+    <style type="text/css">
+        a.fancybox img {
+            border: none;
+            box-shadow: 0 1px 7px rgba(0,0,0,0.6);
+            -o-transform: scale(1,1); -ms-transform: scale(1,1); -moz-transform: scale(1,1); -webkit-transform: scale(1,1); transform: scale(1,1); -o-transition: all 0.2s ease-in-out; -ms-transition: all 0.2s ease-in-out; -moz-transition: all 0.2s ease-in-out; -webkit-transition: all 0.2s ease-in-out; transition: all 0.2s ease-in-out;
+        } 
+        a.fancybox:hover img {
+            position: relative; z-index: 999; -o-transform: scale(1.03,1.03); -ms-transform: scale(1.03,1.03); -moz-transform: scale(1.03,1.03); -webkit-transform: scale(1.03,1.03); transform: scale(1.03,1.03);
+        }
+        .dropdown-item:hover {
+            background-color: #6394e2;
+        }
+        #newissue {
+            color: white;
+        }
+    </style>
+    <style type="text/css">
+        .modal.and.carousel {
+  position: fixed; //
+}
+    </style>
     <link rel="stylesheet" href="jquery.datetimepicker.css">
 <script type="text/javascript" src="assets/ckeditor/ckeditor.js"></script>
     <!-- modernizr css -->
@@ -62,7 +84,7 @@ $noww = date('M Y');
                                 <li><span>Issues Log</span></li>
                                 <li><span></span></li>
                                 <li><span></span></li>
-                                <li><button id="newissue" class="btn btn-primary btn-flat" data-toggle="modal" data-target=".newissue">New Issue</button></li>
+                                <li><a href="new.php" id="newissue" class="btn btn-primary btn-flat">New Issue</a></li>
                                 <li>
                                 <?php 
                                 if (isset($_SESSION['msg'])) {
@@ -109,7 +131,7 @@ $noww = date('M Y');
                                                     <th>Issue</th>
                                                     <th>Priority</th>
                                                     <th>Submitted By</th>
-                                                    <th>Date Reported</th>
+                                                    <th>Date Logged</th>
                                                     <th>Actions</th>
                                                     <th></th>
                                                 </tr>
@@ -130,6 +152,8 @@ $noww = date('M Y');
                                                 $date_twots = strtotime($date_two);
 
                                                 $final_date = $date_twots - $date_onets;
+
+                                                $media = mysqli_query($conn, "SELECT * from media where issue_id = '$issue_id'");
                               
                                                 ?>
                                                 <tr <?php
@@ -146,6 +170,8 @@ $noww = date('M Y');
                                                             echo 'style="background: #5394ed"';
                                                         }elseif ($status == 6) {
                                                             echo 'style="background: #42ebf4"';
+                                                        }elseif ($status == 7) {
+                                                            echo 'style="background: #f95454"';
                                                         }
                                                 ?>>
                                                     <td><?php echo $sn++; ?></td>
@@ -172,6 +198,7 @@ $noww = date('M Y');
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>                                                                        </div>
                                                                     </div>';
@@ -188,6 +215,8 @@ $noww = date('M Y');
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
@@ -202,6 +231,8 @@ $noww = date('M Y');
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
@@ -215,6 +246,8 @@ $noww = date('M Y');
                                                                         <div class="dropdown-divider"></div>
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         </div>
                                                                     </div>';                                                            
                                                         } elseif ($status == 4) {
@@ -228,6 +261,9 @@ $noww = date('M Y');
                                                                         <div class="dropdown-divider"></div>
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
@@ -245,6 +281,9 @@ $noww = date('M Y');
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
                                                                         </div>
                                                                     </div>';
@@ -255,11 +294,28 @@ $noww = date('M Y');
                                                                         Action
                                                                         </button>
                                                                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                                                            <a data-toggle="modal" data-target="#app'.$li_row['issue_id'].'" class="dropdown-item" href="#">Approved</a>
+                                                                            <a data-toggle="modal" data-target="#app'.$li_row['issue_id'].'" class="dropdown-item" href="#">Approval Status</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        </div>
+                                                                    </div>';
+                                                                }
+                                                         elseif ($status == 7) {
+                                                            echo '  <div class="dropdown">
+                                                                        <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        Action
+                                                                        </button>
+                                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a data-toggle="modal" data-target="#comm'.$li_row['issue_id'].'" class="dropdown-item" href="#">Add Comments</a>
+                                                                            <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -267,32 +323,26 @@ $noww = date('M Y');
                                                     </td>
                                                     <td></td>
                                                 </tr>
+                                            <div class="modal fade and carousel slide" id="<?php echo $issue_id; ?>media">
+                                                <div class="modal-dialog">
+                                                  <div class="modal-content">
+                                                    <div class="modal-body">
 
-                                            <!-- media start -->
-                                            <div class="modal fade bd-example-modal-lg" id="media<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-dialog-centered">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Upload Media</h5>
-                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                       <div id="dynamic_slide_show" class="carousel slide" data-ride="carousel">
+                                                        <ol class="carousel-indicators">
+                                                        <?php echo make_slide_indicators($conn, $issue_id); ?>
+                                                        </ol>
+
+                                                        <div class="carousel-inner">
+                                                         <?php echo make_slides($conn, $issue_id); ?>
                                                         </div>
-                                                        <div class="modal-body">
-                                                            <p>Upload Media for this issue</p>
-                                                            <form method='post' enctype='multipart/form-data' action='processing.php'>
-                                                                <div class='file_upload' id='f1'><input name='media[]' type='file'/>1</div>
-                                                                <div id='file_tools'>
-                                                                    <img src='images/file_add.png' id='add_file' title='Add new input'/>
-                                                                    <img src='images/file_del.png' id='del_file' title='Delete'/>
-                                                                </div>
-                                                                <input type='submit' name='submit_media' value='Upload'/>
-                                                            </form>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <!-- Small modal modal end -->
+
+                                                       </div>
+
+                                                    </div><!-- /.modal-body -->
+                                                  </div><!-- /.modal-content -->
+                                                </div><!-- /.modal-dialog -->
+                                            </div><!-- /.modal -->
 
                                              <!-- requires approval start -->
                                             <div class="modal fade" id="req<?php echo $li_row['issue_id']; ?>">
@@ -305,7 +355,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="ncomments"></textarea>
+                                                                <textarea type="text" cols="40" name="ncomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_req">Mark</button>
@@ -329,7 +379,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="dcomments"></textarea>
+                                                                <textarea type="text" cols="40" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_icm">Mark as Incomplete</button>
@@ -380,7 +430,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="dcomments"></textarea>
+                                                                <textarea type="text" cols="40" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_noc">Mark as Not Clear</button>
@@ -404,7 +454,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="ncomments"></textarea>
+                                                                <textarea type="text" cols="40" name="ncomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_nai">Mark as Not an Issue</button>
@@ -428,7 +478,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Comments to this Issue</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="comments" required></textarea>
+                                                                <textarea type="text" cols="40" name="comments" required></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_comm">Submit</button>
@@ -466,6 +516,12 @@ $noww = date('M Y');
                                                                         echo '<b>'.$cq['user'].' - (Incomplete):</b> '.$cq['comment']. ' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 5) {
                                                                         echo '<b>'.$cq['user'].' - (Not Clear):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                    } elseif ($sstatus == 6) {
+                                                                        echo '<b>'.$cq['user'].' - (Require Approval):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                    } elseif ($sstatus == 7) {
+                                                                        echo '<b>'.$cq['user'].' - (Disapproved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                    } elseif ($sstatus == 8) {
+                                                                        echo '<b>'.$cq['user'].' - (Approved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } else {
                                                                         echo '<b>'.$cq['user'].' - :</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     }
@@ -493,7 +549,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="dcomments"></textarea>
+                                                                <textarea type="text" cols="40" name="dcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_done">Mark as Done</button>
@@ -506,20 +562,22 @@ $noww = date('M Y');
                                             </div>
                                             <!-- Small modal modal end -->
 
-                                            <!-- done modal start -->
+                                            <!-- approved modal start -->
                                             <div class="modal fade" id="app<?php echo $li_row['issue_id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Approve Issue</h5>
+                                                            <h5 class="modal-title">Approval</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Approve this issue?</p>
+                                                            <p>Add Additional Comments</p>
                                                             <form method="post" action="processing.php">
+                                                                <textarea cols="40" name="comments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
-                                                                <br><button type="submit" class="btn btn-primary" name="submit_app">Approve</button>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_app">Approved</button>
+                                                                <button type="submit" class="btn btn-danger" name="submit_dapp">Not Approved</button>
                                                             </form><br>
                                                         </div>
                                                         <div class="modal-footer">
@@ -540,7 +598,7 @@ $noww = date('M Y');
                                                         <div class="modal-body">
                                                             <p>Add Additional Comments If Available</p>
                                                             <form method="post" action="processing.php">
-                                                                <textarea type="text" name="rcomments"></textarea>
+                                                                <textarea type="text" cols="40" name="rcomments"></textarea>
                                                                 <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_reo">Mark as Reopened</button>
@@ -618,91 +676,6 @@ $noww = date('M Y');
                                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="container">
-                                        <div class="">
-                                            <form method="post" action="processing.php" name="issue_form" id="issue_form" enctype="multipart/form-data">
-                                                <div class="login-form-body">
-                                                    <div class="row">
-                                                        <div class="col-sm-4">
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Facility</h4>
-                                                                <select name="facility" class="custome-select border-0 pr-3" required>
-                                                                    <option selected="">Select One</option>
-                                                                    <?php
-                                                                    $fc = mysqli_query($conn, "SELECT * from facility");
-                                                                    while ($fc_row = mysqli_fetch_array($fc)) {
-                                                                        echo '<option value="'.$fc_row['name'].'">'.$fc_row['name'].'</option>';
-                                                                    }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-4">
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Type</h4>
-                                                                <select name = "type" class="custome-select border-0 pr-3" required>
-                                                                    <option selected="">Select One</option>
-                                                                    <option value="Issue">Issue</option>
-                                                                    <option value="Request">Request</option>
-                                                                    <option value="Other">Other</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-4">
-                                                            <div class="form-gp">
-                                                                <h4  class="header-title mb-0">Issue Level</h4>
-                                                                <select name="il" id="il" class="custome-select border-0 pr-3" required>
-                                                                    <option selected="">Select One</option>
-                                                                    <option value="1">Level One (1 hr - 24 hrs)</option>
-                                                                    <option value="2">Level Two (24 hrs - 1 wk)</option>
-                                                                    <option value="3">Level Three (1 wk - 1mth)</option>
-                                                                    <option value="4">Level Four (TBD)</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <h4 class="header-title mb-0">Issue</h4>
-                                                    <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"></textarea>
-                                                    <script>
-                                                        CKEDITOR.replace( 'issue' );
-                                                    </script><br>
-                                                    <div class="row"> 
-                                                        <div class="col-sm-3">           
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Issue Client Reporter</h4>
-                                                                <input type="text" name="icr" id="icr" required>
-                                                            </div>
-                                                        </div>
-                                                        <input type="hidden" name="url" value="<?php echo $url; ?>">
-                                                        <div class="col-sm-3">           
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Affected Department(s)</h4>
-                                                                <input type="text" name="ad" id="ad" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-3">           
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Priority</h4>
-                                                                <select name="priority" class="custome-select border-0 pr-3" required>
-                                                                    <option selected="">Select One</option>
-                                                                    <option value="High">High</option>
-                                                                    <option value="Medium">Medium</option>
-                                                                    <option value="Low">Low</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-3">           
-                                                            <div class="form-gp">
-                                                                <h4 class="header-title mb-0">Issue Reported On</h4>
-                                                                <input type="text" id="datetimepicker" name="iro">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <input type="Submit" name="submit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
-                                            </form>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -730,13 +703,10 @@ $noww = date('M Y');
     <script src="assets/js/metisMenu.min.js"></script>
     <script src="assets/js/jquery.slimscroll.min.js"></script>
     <script src="assets/js/jquery.slicknav.min.js"></script>
-
     <script type="text/javascript">
         $(document).ready(function(){
             jQuery('#datetimepicker').datetimepicker();
-            $('#filters').click(function(){
-                    $('#filterid').toggle();
-            });
+           
             jQuery('#datetimepicker1').datetimepicker({
              i18n:{
               de:{
@@ -756,41 +726,41 @@ $noww = date('M Y');
             });
         });
     </script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            var maxField = 10; //Input fields increment limitation
-            var addButton = $('.add_button'); //Add button selector
-            var wrapper = $('.field_wrapper'); //Input field wrapper
-            var fieldHTML = '<div><input type="file" name="media[]"><a href="javascript:void(0);" class="remove_button">Remove</a></div>'; //New input field html 
-            var x = 1; //Initial field counter is 1
-            
-            //Once add button is clicked
-            $(addButton).click(function(){
-                //Check maximum number of input fields
-                if(x < maxField){ 
-                    x++; //Increment field counter
-                    $(wrapper).append(fieldHTML); //Add field html
-                }
-            });
-            
-            //Once remove button is clicked
-            $(wrapper).on('click', '.remove_button', function(e){
-                e.preventDefault();
-                $(this).parent('div').remove(); //Remove field html
-                x--; //Decrement field counter
-            });
-        });
-    </script>
 
     <!-- Start datatable js -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
+
+    <script src="jquery.datetimepicker.full.min.js"></script>
+    <script src="jquery.datetimepicker.js"></script>
+
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
-    <script src="jquery.datetimepicker.full.min.js"></script>
-    <script src="jquery.datetimepicker.js"></script>
+    <script type="text/javascript" src="fancybox/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="fancybox/jquery-migrate-1.2.1.min.js"></script>
+    <script type="text/javascript" src="fancybox/jquery.fancybox-1.3.4.pack.min.js"></script>
+    <script type="text/javascript">
+        $(function($){
+            var addToAll = false;
+            var gallery = false;
+            var titlePosition = 'inside';
+            $(addToAll ? 'img' : 'img.fancybox').each(function(){
+                var $this = $(this);
+                var title = $this.attr('title');
+                var src = $this.attr('data-big') || $this.attr('src');
+                var a = $('<a href="#" class="fancybox"></a>').attr('href', src).attr('title', title);
+                $this.wrap(a);
+            });
+            if (gallery)
+                $('a.fancybox').attr('rel', 'fancyboxgallery');
+            $('a.fancybox').fancybox({
+                titlePosition: titlePosition
+            });
+        });
+        $.noConflict();
+    </script>
 
 </html>

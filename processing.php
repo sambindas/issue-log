@@ -25,7 +25,7 @@ if (isset($_POST['submit_issue'])) {
          VALUES ('$facility', '$type', '$il', '$issue', '$date', '$icr', '$ad', '$so', '$priority', 0, '$month', '$irod')");
 
         $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully.</span>';
-        header("Location: $url ");
+        header("Location: index.php ");
 
     }
 
@@ -57,12 +57,45 @@ if (isset($_POST['edit_issue'])) {
 
 if (isset($_POST['submit_media'])) {
     if (isset($_FILES['media'])) {
-        $my_array = $_POST['caption'];
-        foreach ($my_array as $key => $value) {
-            echo "$key = $value";
+
+        $prefix = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 7);
+        $dir = 'media/';
+        $url = $_POST['url'];
+        $issue_id = $_POST['issue_id'];
+        $so = $_SESSION['name'];
+        $date = date('d-m-Y H:i:s');
+
+        $caption = $_POST['caption'];
+        $fileName = $prefix.$_FILES['media']['name'];
+        $file_size = $_FILES['media']['size'];
+        $file_tmp = $_FILES['media']['tmp_name'];
+        $file_type= $_FILES['media']['type'];
+        $filePath = $dir.$fileName;
+
+        if ($file_size > 1000000) {
+            $_SESSION['msg'] = '<span class="alert alert-danger">File Size Must Be Lower Than 1mb</span>';
+            header("Location: $url");
+            return false;
         }
+
+        if ($file_type != 'image/png' && $file_type != 'image/jpg' && $file_type != 'image/jpeg' && $file_type != 'image/gif') {
+            $_SESSION['msg'] = '<span class="alert alert-danger">File Must Be Either Jpg, Png or Gif</span>';
+            header("Location: $url");
+            return false;
+        }
+
+        if (move_uploaded_file($file_tmp, $filePath)) {
+
+        $query_image = "INSERT INTO media (media_name, issue_id, user, caption, date_added) VALUES ('$fileName','$issue_id','$so', '$caption', '$date')";
+        
+        if(mysqli_query($conn, $query_image)){
+            $_SESSION['msg'] = '<span class="alert alert-success">Media Uploaded Successfully</span>';
+            header("Location: index.php");
+        }      
     }
+
     }
+}
 
 if (isset($_POST['submit_done'])) {
 
@@ -79,7 +112,7 @@ if (isset($_POST['submit_done'])) {
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 1) ");
     $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
     header("Location: $url ");
-} else {
+    } else {
     $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
     header("Location: $url ");
 
@@ -92,14 +125,63 @@ if (isset($_POST['submit_app'])) {
     $issue_id = $_POST['issue_id'];
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
+    $comments = $_POST['comments'];
+
 
     $query = mysqli_query($conn, "UPDATE issue set status = 0 where issue_id = '$issue_id'");
 
-    $_SESSION['msg'] = '<span class="alert alert-success">Issue Approved Successfully.</span>';
+    if ($comments != "") {
+
+    $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 8) ");
+
+    $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
     header("Location: $url ");
+} else {
+     $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
+    header("Location: $url ");
+}
 
 }
 
+if (isset($_POST['submit_dapp'])) {
+
+    $so = $_SESSION['name'];
+    $issue_id = $_POST['issue_id'];
+    $date = date('d-m-Y H:i:s');
+    $url = $_POST['url'];
+    $comments = $_POST['comments'];
+
+
+    $query = mysqli_query($conn, "UPDATE issue set status = 7 where issue_id = '$issue_id'");
+
+    if ($comments != "") {
+
+    $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 7) ");
+
+    $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
+    header("Location: $url ");
+} else {
+     $_SESSION['msg'] = '<span class="alert alert-success">Issue Marked Successfully.</span>';
+    header("Location: $url ");
+}
+
+}
+
+if (isset($_POST['submit_edt'])) {
+
+    $so = $_SESSION['name'];
+    $id = $_POST['id'];
+    $date = date('d-m-Y H:i:s');
+    $url = $_POST['url'];
+    $name = $_POST['fname'];
+    $code = $_POST['fcode'];
+
+    $query = mysqli_query($conn, "UPDATE facility set name = '$name', code = '$code' where id = '$id'");
+
+    $_SESSION['msg'] = '<span class="alert alert-success">Facility Edited Successfully.</span>';
+    header("Location: $url ");
+
+}
 
 if (isset($_POST['confirmed'])) {
 
@@ -180,7 +262,7 @@ if (isset($_POST['submit_noc'])) {
 
     $so = $_SESSION['name'];
     $issue_id = $_POST['issue_id'];
-    $comments = mysqli_real_escape_string($conn, $_POST['ncomments']);
+    $comments = mysqli_real_escape_string($conn, $_POST['dcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
@@ -240,5 +322,47 @@ if (isset($_POST['submit_reo'])) {
     $_SESSION['msg'] = '<span class="alert alert-success">Issue Reopened Successfully.</span>';
     header("Location: $url ");
 }
+}
+
+if (isset($_POST['submit_media2'])) {
+    if (isset($_FILES['media'])) {
+
+        $prefix = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 7);
+        $dir = 'media/';
+        $url = $_POST['url'];
+        $issue_id = $_POST['issue_id'];
+        $so = $_SESSION['name'];
+        $date = date('d-m-Y H:i:s');
+
+        $caption = $_POST['caption'];
+        $fileName = $prefix.$_FILES['media']['name'];
+        $file_size = $_FILES['media']['size'];
+        $file_tmp = $_FILES['media']['tmp_name'];
+        $file_type= $_FILES['media']['type'];
+        $filePath = $dir.$fileName;
+
+        if ($file_size > 1000000) {
+            $_SESSION['msg'] = '<span class="alert alert-danger">File Size Must Be Lower Than 1mb</span>';
+            header("Location: $url");
+            return false;
+        }
+
+        if ($file_type != 'image/png' && $file_type != 'image/jpg' && $file_type != 'image/jpeg' && $file_type != 'image/gif') {
+            $_SESSION['msg'] = '<span class="alert alert-danger">File Must Be Either Jpg, Png or Gif</span>';
+            header("Location: $url");
+            return false;
+        }
+
+        if (move_uploaded_file($file_tmp, $filePath)) {
+
+        $query_image = "INSERT INTO media (media_name, issue_id, user, caption, date_added) VALUES ('$fileName','$issue_id','$so', '$caption', '$date')";
+        
+        if(mysqli_query($conn, $query_image)){
+            $_SESSION['msg'] = '<span class="alert alert-success">Media Uploaded Successfully. Upload Another</span>';
+            header("Location: $url");
+        }      
+    }
+
+    }
 }
 ?>

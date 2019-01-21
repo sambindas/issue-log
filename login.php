@@ -65,6 +65,7 @@ header("Location: index.php");
                         </div>
                         <div class="submit-btn-area">
                             <input value="Submit" id="form_submit" class="btn btn-primary" type="submit">
+                            <div id="loade"></div>
                         </div>
                         <div class="form-footer text-center mt-5">
                             <p class="text-muted">Don't have an account? <a href="register.php">Sign up</a></p>
@@ -94,12 +95,15 @@ header("Location: index.php");
         $(document).ready(function(){
 
             $('#form_submit').click(function(){
-
+                $(this).fadeOut();
+                $('#loade').html('<img src="assets/images/eclipse.gif">');
                 var email = $('#email').val();
                 var password = $('#password').val();
 
                 if (email == '' || password == '') {
                     $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
+                    $(this).fadeIn();
+                $('#loade').html('');
                     return false;
                 } else {
 
@@ -117,6 +121,8 @@ header("Location: index.php");
                                 window.location.replace('index.php');
                             } else {
                                 $('#formErr').html('<span class="alert alert-danger">Authentication Failed!</span>');
+                                $('#form_submit').fadeIn();
+                                $('#loade').html('');
                                 return false;
                             }
                         }

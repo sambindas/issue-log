@@ -56,15 +56,25 @@ $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'")
             require 'header.php';
             ?><br>
                     <div class="container">
+                        <p><span class="alert alert-warning"><b>Note:</b> Image must not be more than 1mb&nbsp;&nbsp;<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Only <b>Jpg,</b> <b>Jpeg,</b><b>Png</b> and <b>Gif</b> are allowed</span></p>
+                                <?php 
+                                if (isset($_SESSION['msg'])) {
+                                    echo $_SESSION['msg'];
+                                    unset($_SESSION['msg']);
+                                }
+                                ?><br><br>
                         <form method='post' enctype='multipart/form-data' action='processing.php'>
-                            <div class='file_upload' id='f1'><input name='media[]' type='file'/>1</div><br>
-                            <input type="text" name="caption[]" placeholder="input caption">
-                            <div id='file_tools'>
+                            <div class='file_upload' id='f1'><input name='media' type='file' required /></div><br>
+                            <textarea type="text" name="caption" placeholder="Insert Caption" required></textarea>
+                            <!-- <div id='file_tools'>
                                 <img src='assets/images/file_add.png' height="10" width="20" id='add_file' title='Add new input'/>
                                 <img src='assets/images/file_del.png' height="10" width="20" id='del_file' title='Delete'/>
-                            </div><br>
+                            </div><br> -->
+                            <br><br>
                             <input type="hidden" name="issue_id" value="<?php echo $issue_id; ?>">
-                            <input type='submit' class="btn" name='submit_media' value='Upload'/>
+                            <input type="hidden" name="url" value="<?php echo $url; ?>">
+                            <input type='submit' class="btn btn-primary" name='submit_media' value='Upload'/>
+                            <input type='submit' class="btn btn-success" name='submit_media2' value='Upload And Add New'/>
                         </form>
                     </div>
                 </div>

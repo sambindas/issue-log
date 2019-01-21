@@ -17,7 +17,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Users</title>
+    <title>Facilities</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -58,10 +58,10 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             <ul class="breadcrumbs pull-left">
                                 <li><a href="index.php">Home</a></li>
                                 <li><span>Manage / </span></li>
-                                <li><span>Users</span></li>
+                                <li><span>Facilities</span></li>
                                 <li><span></span></li>
                                 <li><span></span></li>
-                                <li><button id="newissue" class="btn btn-primary btn-flat" data-toggle="modal" data-target=".newissue">New User</button></li>
+                                <li><button id="newissue" class="btn btn-primary btn-flat" data-toggle="modal" data-target=".newissue">New Facility</button></li>
                                 <li>
                                 <?php 
                                 if (isset($_SESSION['msg'])) {
@@ -99,38 +99,31 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                             <thead class="text-capitalize">
                                                 <tr>
                                                     <th>S/N</th>
-                                                    <th>Name</th>
-                                                    <th>Role</th>
-                                                    <th>Email</th>
-                                                    <th>Phone</th>
-                                                    <th>Actions</th>
+                                                    <th>Facility Name</th>
+                                                    <th>Facility Code</th>
+                                                    <th>Action</th>
                                                     <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $il = mysqli_query($conn, "SELECT * from user");
+                                                $il = mysqli_query($conn, "SELECT * from facility");
                                                 $sn = 1;
                                                 while ($li_row = mysqli_fetch_array($il)) {
                               
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $sn++; ?></td>
-                                                    <td><?php echo $li_row['user_name'] ; ?></td>
-                                                    <td><?php echo $li_row['user_role'] ; ?></td>
-                                                    <td><?php echo $li_row['email'] ; ?></td>
-                                                    <td><?php echo $li_row['phone'] ; ?></td>
+                                                    <td><?php echo $li_row['name'] ; ?></td>
+                                                    <td><?php echo $li_row['code'] ; ?></td>
                                                     <td><div class="dropdown">
                                                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
                                                             </button>
                                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                 <?php
-                                                                if ($li_row['status']==0) {
-                                                                    echo '<a class="dropdown-item" href="#">Activate</a>';
-                                                                } else {
-                                                                    echo '<a data-toggle="modal" data-target="#act'.$li_row["user_id"].'" class="dropdown-item" href="#">Deactivate</a>';
-                                                                }
+                                                                    echo '<a data-toggle="modal" data-target="#edt'.$li_row["id"].'" class="dropdown-item" href="#">Edit</a>';
+                                                                
                                                                 ?>
                                                             </div>
                                                         </div>
@@ -138,20 +131,22 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                     <td></td>
                                                 </tr>
 
-                                            <!-- activate modal start -->
-                                            <div class="modal fade" id="act<?php echo $li_row['user_id']; ?>">
+                                            <!-- edit modal start -->
+                                            <div class="modal fade" id="edt<?php echo $li_row['id']; ?>">
                                                 <div class="modal-dialog modal-sm">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Deactivate User</h5>
+                                                            <h5 class="modal-title">Edit Facility</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Are you sure you want to Deactivate?</p>
+                                                            <p>Edit this Facility</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="text" name="fcode" value="<?php echo $li_row['code']; ?>"><Br><br>
+                                                                <input type="text" name="fname" value="<?php echo $li_row['name']; ?>">
+                                                                <input type="hidden" name="id" value="<?php echo $li_row['id']; ?>">
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
-                                                                <br><button type="submit" class="btn btn-primary" name="submit_reo">Deactivate</button>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_edt">Edit</button>
                                                             </form><br>
                                                         </div>
                                                         <div class="modal-footer">
@@ -176,7 +171,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Register User</h5>
+                                    <h5 class="modal-title">Add Facility</h5>
                                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                 </div>
                                 <div class="modal-body">
@@ -186,51 +181,24 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                         <div class="container">
                                                 <form action="javascript:;">
                                                     <div class="login-form-head">
-                                                        <h4>Register User</h4>
+                                                        <h4>Add Facility</h4>
                                                         <p id="formErr"></p>
                                                     </div>
                                                     <div class="login-form-body">
                                                         <div class="form-gp">
-                                                            <label for="exampleInputName1">Full Name</label>
-                                                            <input type="text" id="fullname" required>
+                                                            <label for="exampleInputName1">Facility Code</label>
+                                                            <input type="text" id="fcode" required>
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfc"></div>
+                                                        </div>
+                                                        <div class="form-gp">
+                                                            <label for="exampleInputName1">Facility Name</label>
+                                                            <input type="text" id="fname" required>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errfn"></div>
                                                         </div>
-                                                        <div class="form-gp">
-                                                            <label for="exampleInputEmail1">Email address</label>
-                                                            <input type="email" id="email" required>
-                                                            <i class="ti-email"></i><br>
-                                                            <div id="errem"></div>
-                                                        </div>
-                                                        <div class="form-gp">
-                                                            <label for="exampleInputEmail1">Phone Number</label>
-                                                            <input type="text" id="phone" required>
-                                                            <i class="ti-mobile"></i><br>
-                                                            <div id="errpn"></div>
-                                                        </div>
-                                                        <div class="form-gp">
-                                                            <label for="exampleInputEmail1">Role</label><br>
-                                                            <select class="custome-select border-0 pr-3" name="role" id="user_role">
-                                                                <option></option>
-                                                                <option value="developer">Developer</option>
-                                                                <option value="support">Support Officer</option>
-                                                            </select>
-                                                            <i class="ti-user"></i><br>
-                                                            <div id="errpn"></div>
-                                                        </div>
-                                                        <div class="form-gp">
-                                                            <label for="exampleInputPassword1">Password</label>
-                                                            <input type="password" id="password" required>
-                                                            <i class="ti-lock"></i>
-                                                        </div>
-                                                        <div class="form-gp">
-                                                            <label for="exampleInputPassword2">Confirm Password</label>
-                                                            <input type="password" id="password2" required>
-                                                            <i class="ti-lock"></i><br>
-                                                            <div id="perr"></div>
-                                                        </div>
                                                         <div class="submit-btn-area">
-                                                            <input class="btn btn-primary" id="form_submit" type="submit" value="Submit Information">
+                                                            <input class="btn btn-primary" id="form_submit" type="submit" value="Submit">
                                                         </div>
                                                     </div>
                                                 </form>
@@ -281,29 +249,25 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                 $('#form_submit').click(function(){
                     console.log(876);
 
-                    var name = $('#fullname').val();
-                    var email = $('#email').val();
-                    var phone = $('#phone').val();
-                    var password = $('#password').val();
-                    var password2 = $('#password2').val();
-                    var role = $('#user_role').val();
+                    var name = $('#fname').val();
+                    var code = $('#fcode').val();
 
-                    if (name == '' || email == '' || phone == '' || password == '' || password2 == '') {
+                    if (name == '' || code == '') {
                         $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
                         return false;
                     }
-                    else if (name != '' || email != '' || phone != '' || password != '' || password2 != '') {
+                    else if (name != '' || code != '') {
                         $('#formErr').html('');
 
-                        var datastring = 'email='+email;
+                        var datastring = 'code='+code;
 
                         $.ajax({
-                            url: 'ajax/email.php',
+                            url: 'ajax/code.php',
                             method: 'post',
                             data: datastring,
                             success: function(msg) {
                                 if (msg == 1) {
-                                    $('#errem').html('<div class="alert alert-danger"><p>Another User Exists With That Email</p></div>');
+                                    $('#errfc').html('<div class="alert alert-danger"><p>Facility Exists</p></div>');
 
                                     return false;
 
@@ -314,28 +278,17 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             }
                         });
 
-
-                        if (password != password2) {
-                            $('#form_submit').attr('disabled', 'true');
-                            $('#perr').html('<div class="alert alert-danger"><p>Passwords Do Not Match</p></div>');
-                            $('#form_submit').removeAttr('disabled');
-                            return false;
-                        } else {
-                            $('#perr').html('');
-                        }
-
-
-                        var datastring = 'name='+name+'&email='+email+'&phone='+phone+'&password='+password+'&role='+role;
+                        var datastring = 'name='+name+'&code='+code;
 
                         function registerFinal() {
 
                         $.ajax({
-                            url: 'ajax/register.php',
+                            url: 'ajax/fac.php',
                             method: 'post',
                             data: datastring,
                             success: function(msg) {
                                 if (msg == 1) {
-                                    window.location.replace('user.php');
+                                    window.location.replace('facility.php');
                                 }else {
                                     $('#loaderxy').html('<span class="alert alert-danger">Something Went wrong. Please try again</span>');
                                 }
