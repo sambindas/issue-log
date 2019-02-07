@@ -61,7 +61,7 @@ $noww = date('M Y');
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Facility</h4>
                                                 <select name="facility" class="custome-select border-0 pr-3" required>
-                                                    <option selected="">Select One</option>
+                                                    <option value="" selected="">Select One</option>
                                                     <?php
                                                     $fc = mysqli_query($conn, "SELECT * from facility");
                                                     while ($fc_row = mysqli_fetch_array($fc)) {
@@ -75,7 +75,7 @@ $noww = date('M Y');
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Type</h4>
                                                 <select name = "type" class="custome-select border-0 pr-3" required>
-                                                    <option selected="">Select One</option>
+                                                    <option value="" selected="">Select One</option>
                                                     <option value="Issue">Issue</option>
                                                     <option value="Request">Request</option>
                                                     <option value="Other">Other</option>
@@ -86,7 +86,7 @@ $noww = date('M Y');
                                             <div class="form-gp">
                                                 <h4  class="header-title mb-0">Issue Level</h4>
                                                 <select name="il" id="il" class="custome-select border-0 pr-3" required>
-                                                    <option selected="">Select One</option>
+                                                    <option value="" selected="">Select One</option>
                                                     <option value="1">Level One (1 hr - 24 hrs)</option>
                                                     <option value="2">Level Two (24 hrs - 1 wk)</option>
                                                     <option value="3">Level Three (1 wk - 1mth)</option>
@@ -96,7 +96,7 @@ $noww = date('M Y');
                                         </div>
                                     </div>
                                     <h4 class="header-title mb-0">Issue</h4>
-                                    <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"></textarea>
+                                    <textarea cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue" required></textarea>
                                     <script>
                                         CKEDITOR.replace( 'issue' );
                                     </script><br>
@@ -118,7 +118,7 @@ $noww = date('M Y');
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Priority</h4>
                                                 <select name="priority" class="custome-select border-0 pr-3" required>
-                                                    <option selected="">Select One</option>
+                                                    <option value="" selected="">Select One</option>
                                                     <option value="High">High</option>
                                                     <option value="Medium">Medium</option>
                                                     <option value="Low">Low</option>
@@ -128,7 +128,7 @@ $noww = date('M Y');
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Issue Reported On</h4>
-                                                <input type="text" id="datetimepicker" name="iro">
+                                                <input type="text" id="datetimepicker" name="iro" required>
                                             </div>
                                         </div>
                                     </div>
@@ -184,6 +184,15 @@ $noww = date('M Y');
              format:'d/m/Y'
             });
         });
+
+         $('#submit_issue').click(function(){
+            var issue = $('#issue').val();
+
+            if (issue == '') {
+                alert('Please Fill the issue');
+                return false;
+            }
+         });
     </script>
 
     <!-- Start datatable js -->

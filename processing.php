@@ -18,11 +18,12 @@ if (isset($_POST['submit_issue'])) {
     $so = $_SESSION['name'];
     $priority = $_POST['priority'];
     $date = date('d-m-Y H:i:s');
+    $fdate = date('Y-m-d');
     $url = $_POST['url'];
     $month = date('M Y');
 
-        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, issue_client_reporter, affected_dept, support_officer, priority, status, month, issue_reported_on)
-         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$icr', '$ad', '$so', '$priority', 0, '$month', '$irod')");
+        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, fissue_date, issue_client_reporter, affected_dept, support_officer, priority, status, month, issue_reported_on)
+         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$fdate', '$icr', '$ad', '$so', '$priority', 0, '$month', '$irod')");
 
         $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully.</span>';
         header("Location: index.php ");
@@ -204,7 +205,7 @@ if (isset($_POST['submit_icm'])) {
 
     $so = $_SESSION['name'];
     $issue_id = $_POST['issue_id'];
-    $comments = mysqli_real_escape_string($conn, $_POST['ncomments']);
+    $comments = mysqli_real_escape_string($conn, $_POST['dcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 

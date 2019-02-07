@@ -60,7 +60,7 @@ header("Location: index.php");
                         </div>
                         <div class="row mb-4 rmber-area">
                             <div class="col-6 text-right">
-                                <a href="#">Forgot Password?</a>
+                                <a href="reset-pass.php">Forgot Password?</a>
                             </div>
                         </div>
                         <div class="submit-btn-area">

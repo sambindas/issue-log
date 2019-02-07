@@ -10,6 +10,15 @@ $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERV
 $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 $noww = date('M Y');
+if (isset($_POST['s_date'])) {
+    $from = $_POST['from'];
+    $to = $_POST['to'];
+$il = mysqli_query($conn, "SELECT * from issue where fissue_date between '$from' and '$to'");
+
+    $noww = $from.' to '.$to;
+} else {
+$il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
+}
 
 ?>
 
@@ -84,7 +93,7 @@ $noww = date('M Y');
                                 <li><span>Issues Log</span></li>
                                 <li><span></span></li>
                                 <li><span></span></li>
-                                <li><a href="new.php" id="newissue" class="btn btn-primary btn-flat">New Issue</a></li>
+                                <a href="new.php" id="newissue" class="btn btn-primary btn-flat">New Issue</a>
                                 <li>
                                 <?php 
                                 if (isset($_SESSION['msg'])) {
@@ -101,7 +110,8 @@ $noww = date('M Y');
                             <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?php echo $_SESSION['name']; ?> <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="#">Message</a>
-                                <a class="dropdown-item" href="#">Settings</a>
+                                <a class="dropdown-item" href="settings.php">Settings</a>
+                                <a class="dropdown-item" href="changepassword.php">Change Password</a>
                                 <a class="dropdown-item" href="logout.php">Log Out</a>
                             </div>
                         </div>
@@ -115,10 +125,15 @@ $noww = date('M Y');
                     <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title">Issues Log for <?php echo date('M Y'); ?></h4>
+                                <h4 class="header-title">Issues Log for <?php echo $noww; ?></h4>
                                 <button class="btn btn-primary btn-flat" id="filters">Filter</button><br><Br>
-                                <form id="filterid" style="display: none;">
-                                    <input type="text" id="datetimepicker1" placeholder="From" name="date1">
+                                <form method="post" action="" id="filterid" style="display: none;">
+                                    From
+                                        <input type="text" id="datetimepicker1" value="<?php echo date('Y-m-d') ?>" readonly placeholder="From" name="from"><i class="ti-calender"></i>
+                                    
+                                    To
+                                        <input type="text" id="datetimepicker2" value="<?php echo date('Y-m-d') ?>" readonly placeholder="From" name="to"><i class="ti-calender"></i>
+                                        <button type="submit" name="s_date" class="btn-flat btn btn-primary btn-xs">Submit</button>
                                 </form><br>
                                 <div class="data-tables datatable-primary">
                                     <div id="my_table">
@@ -138,7 +153,6 @@ $noww = date('M Y');
                                             </thead>
                                             <tbody>
                                                 <?php
-                                                $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                 $sn = 1;
                                                 while ($li_row = mysqli_fetch_array($il)) {   
                                                 $status = $li_row['status'];   
@@ -688,7 +702,7 @@ $noww = date('M Y');
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved.</p>
+                <p>© Copyright <?php echo date('Y'); ?>. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->
@@ -705,7 +719,19 @@ $noww = date('M Y');
     <script src="assets/js/jquery.slicknav.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
-            jQuery('#datetimepicker').datetimepicker();
+            $('#filters').click(function(){
+                console.log(23);
+                $('#filterid').toggle();
+            });
+        });
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            jQuery('#datetimepicker2').datetimepicker({
+                format: 'Y-m-d',
+                timepicker:false,
+                maxDate: '0d',
+            });
            
             jQuery('#datetimepicker1').datetimepicker({
              i18n:{
@@ -721,10 +747,12 @@ $noww = date('M Y');
                ]
               }
              },
+             format:'Y-m-d',
              timepicker:false,
-             format:'d/m/Y'
+             maxDate: '0d'
             });
         });
+
     </script>
 
     <!-- Start datatable js -->
@@ -733,8 +761,6 @@ $noww = date('M Y');
     <script src="https://cdn.datatables.net/responsive/2.2.3/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
 
-    <script src="jquery.datetimepicker.full.min.js"></script>
-    <script src="jquery.datetimepicker.js"></script>
 
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
@@ -762,5 +788,7 @@ $noww = date('M Y');
         });
         $.noConflict();
     </script>
+    <script src="jquery.datetimepicker.full.min.js"></script>
+    <script src="jquery.datetimepicker.js"></script>
 
 </html>

@@ -78,7 +78,8 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?php echo $_SESSION['name']; ?> <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="#">Message</a>
-                                <a class="dropdown-item" href="#">Settings</a>
+                                <a class="dropdown-item" href="settings.php">Settings</a>
+                                <a class="dropdown-item" href="changepassword.php">Change Password</a>
                                 <a class="dropdown-item" href="logout.php">Log Out</a>
                             </div>
                         </div>
@@ -212,8 +213,8 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                             <label for="exampleInputEmail1">Role</label><br>
                                                             <select class="custome-select border-0 pr-3" name="role" id="user_role">
                                                                 <option></option>
-                                                                <option value="developer">Developer</option>
-                                                                <option value="support">Support Officer</option>
+                                                                <option value="Developer">Developer</option>
+                                                                <option value="Support Officer">Support Officer</option>
                                                             </select>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errpn"></div>
@@ -297,6 +298,15 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
                         var datastring = 'email='+email;
 
+                        if (password != password2) {
+                            $('#form_submit').attr('disabled', 'true');
+                            $('#perr').html('<div class="alert alert-danger"><p>Passwords Do Not Match</p></div>');
+                            $('#form_submit').removeAttr('disabled');
+                            return false;
+                        } else {
+                            $('#perr').html('');
+                        }
+
                         $.ajax({
                             url: 'ajax/email.php',
                             method: 'post',
@@ -313,16 +323,6 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                 }
                             }
                         });
-
-
-                        if (password != password2) {
-                            $('#form_submit').attr('disabled', 'true');
-                            $('#perr').html('<div class="alert alert-danger"><p>Passwords Do Not Match</p></div>');
-                            $('#form_submit').removeAttr('disabled');
-                            return false;
-                        } else {
-                            $('#perr').html('');
-                        }
 
 
                         var datastring = 'name='+name+'&email='+email+'&phone='+phone+'&password='+password+'&role='+role;

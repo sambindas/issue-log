@@ -98,9 +98,10 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                         <table id="dataTable2" class="text-center table table-hover">
                                             <thead class="text-capitalize">
                                                 <tr>
-                                                    <th>S/N</th>
-                                                    <th>Facility Name</th>
                                                     <th>Facility Code</th>
+                                                    <th>Facility Name</th>
+                                                    <th>Contact Person</th>
+                                                    <th>Server IP</th>
                                                     <th>Action</th>
                                                     <th></th>
                                                 </tr>
@@ -113,9 +114,11 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                               
                                                 ?>
                                                 <tr>
-                                                    <td><?php echo $sn++; ?></td>
+                                                    <td><?php echo $li_row['code'] ; ?></td>
                                                     <td><?php echo $li_row['name'] ; ?></td>
                                                     <td><?php echo $li_row['code'] ; ?></td>
+                                                    <td><?php echo $li_row['cperson'] ; ?></td>
+                                                    <td><?php echo $li_row['serverip'] ; ?></td>
                                                     <td><div class="dropdown">
                                                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
@@ -194,6 +197,18 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                         <div class="form-gp">
                                                             <label for="exampleInputName1">Facility Name</label>
                                                             <input type="text" id="fname" required>
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
+                                                            <label for="exampleInputName1">Contact Person</label>
+                                                            <input type="text" id="cperson" required>
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
+                                                            <label for="exampleInputName1">Server IP</label>
+                                                            <input type="text" id="serverip" required>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errfn"></div>
                                                         </div>

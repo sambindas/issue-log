@@ -8,11 +8,11 @@ require '../connection.php';
 	$email = mysqli_real_escape_string($conn, $_POST['email']);
 	$phone = mysqli_real_escape_string($conn, $_POST['phone']);
 	$password = sha1($_POST['password']);
-	$token = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 40);
+	$token = substr(str_shuffle(str_repeat("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz", 5)), 0, 40);
 	$role = mysqli_real_escape_string($conn, $_POST['role']);
 
-	$query = mysqli_query($conn, "INSERT into user (user_name, email, phone, password, date_added, token_status, user_role, status) 
-								values ('$name', '$email', '$phone', '$password', now(), '$token', '$role', 1)");
+	$query = mysqli_query($conn, "INSERT into user (user_name, email, phone, password, date_added, user_role, status) 
+								values ('$name', '$email', '$phone', '$password', now(), '$role', 1)");
 
 	if ($query) {
 		$_SESSION['msg'] = '<span class="alert alert-success">User Registered Successfully</span>';

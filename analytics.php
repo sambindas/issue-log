@@ -3,53 +3,56 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+
+$result = mysqli_query($conn, "SELECT count(issue_id) as numberr, facility from issue group by facility");
+
+$number = [];
+$facility = [];
+
+while ($row = mysqli_fetch_array($result)) {
+    $numberr[] = $row['numberr'];
+    $facility[] = $row['facility'];
+}
+ echo json_encode($numberr);
+
 ?>
 <!DOCTYPE html>
 <html>
 <head>
 	<title>CHarts</title>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
 </head>
 <body>
-<canvas id="myChart"></canvas>
-</body>
-<script>
-var ctx = document.getElementById("myChart");
-var myChart = new Chart(ctx, {
-    type: 'bubble',
-    data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero:true
-                }
-            }]
-        }
-    }
-});
-</script>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mt-5">
+                <div class="card">
+                    <div class="card-body">  
+                        <div id="chartDiv"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js"></script>
+    <script src="https://cdn.zingchart.com/zingchart.min.js"></script>
+    <script>
+    var chartData = {
+      type: 'bar',  // Specify your chart type here.
+      title: {
+        text: 'Issues Chart' // Adds a title to your chart
+      },
+      legend: {values: <?php  echo json_encode($facility); ?> }, // Creates an interactive legend
+      series: [  // Insert your series data here.
+          { values: <?php  echo json_encode($numberr); ?>}
+      ]
+    };
+    zingchart.render({ // Render Method[3]
+      id: 'chartDiv',
+      data: chartData,
+      height: 400,
+      width: 600
+    });
+  </script>
+   
+   </body>
 </html>

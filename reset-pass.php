@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Recover Password - srtdash</title>
+    <title>Recover Password</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -25,10 +25,6 @@
 </head>
 
 <body>
-    <!--[if lt IE 8]>
-            <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-    <!-- preloader area start -->
     <div id="preloader">
         <div class="loader"></div>
     </div>
@@ -44,13 +40,8 @@
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
-                            <label for="exampleInputPassword1">Old Password</label>
-                            <input type="password" id="exampleInputPassword1">
-                            <i class="ti-lock"></i>
-                        </div>
-                        <div class="form-gp">
-                            <label for="exampleInputPassword2">New Password</label>
-                            <input type="password" id="exampleInputPassword2">
+                            <label for="exampleInputPassword1">Input Your Email</label>
+                            <input type="email" required id="email">
                             <i class="ti-lock"></i>
                         </div>
                         <div class="submit-btn-area mt-5">
@@ -76,6 +67,36 @@
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
+    <script type="text/javascript">
+        
+        $(document).ready(function(){
+
+            $('#form_submit').click(function(){
+                $(this).fadeOut();
+                var email = $('#email').val();
+
+                    var datastring = 'email='+email;
+
+                    $.ajax({
+                            url: 'ajax/email.php',
+                            method: 'post',
+                            data: datastring,
+                            success: function(msg) {
+                                if (msg == 1) {
+                                    $('#errem').html('<div class="alert alert-danger"><p>Another User Exists With That Email</p></div>');
+
+                                    return false;
+
+                                } else {
+                                    $('#errem').html('');
+                                    registerFinal();
+                                }
+                            }
+                        });
+                
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -20,7 +20,7 @@
                             <li class="active">
                                 <a href="javascript:void(0)" aria-expanded="true"><i class="ti-dashboard"></i><span>dashboard</span></a>
                                 <ul class="collapse">
-                                    <li class="active"><a href="index.php">Dashboard</a></li>
+                                    <li class="active"><a href="index.php">Home</a></li>
                                 </ul>
                             </li>
                             <li>
