@@ -13,9 +13,13 @@ $noww = date('M Y');
 if (isset($_POST['s_date'])) {
     $from = $_POST['from'];
     $to = $_POST['to'];
+
+    $fromm = date('d-M-Y' , strtotime($from));
+    $too = date('d-M-Y' , strtotime($to));
+
 $il = mysqli_query($conn, "SELECT * from issue where fissue_date between '$from' and '$to'");
 
-    $noww = $from.' to '.$to;
+    $noww = $fromm.' to '.$too;
 } else {
 $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
 }
@@ -109,9 +113,9 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                             <img class="avatar user-thumb" src="assets/images/author/avatar.png" alt="avatar">
                             <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?php echo $_SESSION['name']; ?> <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">Message</a>
                                 <a class="dropdown-item" href="settings.php">Settings</a>
                                 <a class="dropdown-item" href="changepassword.php">Change Password</a>
+                                <a class="dropdown-item" href="help.php">Help</a>
                                 <a class="dropdown-item" href="logout.php">Log Out</a>
                             </div>
                         </div>
@@ -126,7 +130,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                         <div class="card">
                             <div class="card-body">
                                 <h4 class="header-title">Issues Log for <?php echo $noww; ?></h4>
-                                <button class="btn btn-primary btn-flat" id="filters">Filter</button><br><Br>
+                                <button class="btn btn-primary btn-flat" id="filters">Date Filter</button><br><Br>
                                 <form method="post" action="" id="filterid" style="display: none;">
                                     From
                                         <input type="text" id="datetimepicker1" value="<?php echo date('Y-m-d') ?>" readonly placeholder="From" name="from"><i class="ti-calender"></i>

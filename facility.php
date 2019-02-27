@@ -9,6 +9,12 @@ $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERV
 
 $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
+if (isset($_POST['delete_f'])) {
+    $id = $_POST['id'];
+
+    mysqli_query($conn, "DELETE from facility where id = $id");
+    $_SESSION['msg'] = '<span class="alert alert-success">Facility Deleted Successfully.</span>';
+}
 ?>
 
 <!doctype html>
@@ -101,6 +107,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                     <th>Facility Code</th>
                                                     <th>Facility Name</th>
                                                     <th>Contact Person</th>
+                                                    <th>Contact Person Phone</th>
                                                     <th>Server IP</th>
                                                     <th>Action</th>
                                                     <th></th>
@@ -116,9 +123,9 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                 <tr>
                                                     <td><?php echo $li_row['code'] ; ?></td>
                                                     <td><?php echo $li_row['name'] ; ?></td>
-                                                    <td><?php echo $li_row['code'] ; ?></td>
-                                                    <td><?php echo $li_row['cperson'] ; ?></td>
-                                                    <td><?php echo $li_row['serverip'] ; ?></td>
+                                                    <td><?php echo $li_row['contact_person'] ; ?></td>
+                                                    <td><?php echo $li_row['contact_person_phone'] ; ?></td>
+                                                    <td><?php echo $li_row['server_ip'] ; ?></td>
                                                     <td><div class="dropdown">
                                                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
@@ -126,7 +133,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                 <?php
                                                                     echo '<a data-toggle="modal" data-target="#edt'.$li_row["id"].'" class="dropdown-item" href="#">Edit</a>';
-                                                                
+                                                                    echo '<a data-toggle="modal" data-target="#del'.$li_row["id"].'" class="dropdown-item" href="#">Delete</a>';
                                                                 ?>
                                                             </div>
                                                         </div>
@@ -145,11 +152,34 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                         <div class="modal-body">
                                                             <p>Edit this Facility</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="text" name="fcode" value="<?php echo $li_row['code']; ?>"><Br><br>
-                                                                <input type="text" name="fname" value="<?php echo $li_row['name']; ?>">
+                                                                <input type="text" placeholder="Enter Facility Code" name="fcode" value="<?php echo $li_row['code']; ?>"><Br><br>
+                                                                <input type="text" placeholder="Facility Name" name="fname" value="<?php echo $li_row['name']; ?>"><br><br>
+                                                                <input type="text" placeholder="Contact Person" name="cperson" value="<?php echo $li_row['contact_person']; ?>"><br><br>
+                                                                <input type="text" placeholder="Contact Person's Phone" name="cpersonp" value="<?php echo $li_row['contact_person_phone']; ?>"><br><br>
+                                                                <input type="text" placeholder="Server IP" name="server_ip" value="<?php echo $li_row['server_ip']; ?>">
                                                                 <input type="hidden" name="id" value="<?php echo $li_row['id']; ?>">
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
                                                                 <br><button type="submit" class="btn btn-primary" name="submit_edt">Edit</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- delete modal start -->
+                                            <div class="modal fade" id="del<?php echo $li_row['id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Delete Facility</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are You Sure?</p>
+                                                            <form method="post" action="">
+                                                                <input type="hidden" name="id" value="<?php echo $li_row['id']; ?>">
+                                                                <br><button type="submit" class="btn btn-primary" name="delete_f">Delete</button>
                                                             </form><br>
                                                         </div>
                                                         <div class="modal-footer">
@@ -207,8 +237,14 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                             <div id="errfn"></div>
                                                         </div>
                                                         <div class="form-gp">
+                                                            <label for="exampleInputName1">Contact Person Phone</label>
+                                                            <input type="text" id="cpersonp" required>
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
                                                             <label for="exampleInputName1">Server IP</label>
-                                                            <input type="text" id="serverip" required>
+                                                            <input type="text" id="serverip">
                                                             <i class="ti-user"></i><br>
                                                             <div id="errfn"></div>
                                                         </div>
@@ -266,12 +302,15 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
                     var name = $('#fname').val();
                     var code = $('#fcode').val();
+                    var cperson = $('#cperson').val();
+                    var cpersonp = $('#cpersonp').val();
+                    var serverip = $('#serverip').val();
 
-                    if (name == '' || code == '') {
-                        $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
+                    if (name == '' || code == '' || cperson == '' || cpersonp == '') {
+                        $('#formErr').html('<span class="alert alert-danger">Please Fill Required Fields</span>');
                         return false;
                     }
-                    else if (name != '' || code != '') {
+                    else if (name != '' || code != '' || cperson != '' || cpersonp != '') {
                         $('#formErr').html('');
 
                         var datastring = 'code='+code;
@@ -293,14 +332,14 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                             }
                         });
 
-                        var datastring = 'name='+name+'&code='+code;
+                        var datastringg = 'name='+name+'&code='+code+'&cperson='+cperson+'&cpersonp='+cpersonp+'&serverip='+serverip;
 
                         function registerFinal() {
 
                         $.ajax({
                             url: 'ajax/fac.php',
                             method: 'post',
-                            data: datastring,
+                            data: datastringg,
                             success: function(msg) {
                                 if (msg == 1) {
                                     window.location.replace('facility.php');

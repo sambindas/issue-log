@@ -11,6 +11,22 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 $email = $_SESSION['email'];
 
+if (isset($_POST['form_submit'])) {
+
+    $name = $_POST['name'];
+    $email2 = $_POST['email'];
+    $phone = $_POST['phone'];
+    $role = $_POST['role'];
+
+    $user = mysqli_query($conn, "UPDATE user set user_name = '$name', email = '$email2', phone = '$phone', user_role = '$role' where email = '$email'");
+
+    if ($user) {
+        $_SESSION['msg'] = '<span class="alert alert-success">Profile Edited Successfully</span>';
+        $_SESSION['name'] = $name;
+        $_SESSION['email'] = $email2;
+    }
+}
+
 $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
 
 ?>
@@ -64,29 +80,35 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
 
                                     <div class="login-area">
                                         <div class="container">
-                                                <form action="javascript:;">
+                                                <form action="" method="post">
                                                     <div class="login-form-body">
+                                                        <?php 
+                                                        if (isset($_SESSION['msg'])) {
+                                                            echo $_SESSION['msg'];
+                                                            unset($_SESSION['msg']);
+                                                        }
+                                                        ?>
                                                         <?php
                                                         while ($user_row = mysqli_fetch_array($user)) {
                                                             $id = $user_row['user_id'];
                                                             $name = $user_row['user_name'];
-                                                            $email = $user_row['email'];
+                                                            $email3 = $user_row['email'];
                                                             $phone = $user_row['phone'];
                                                             $role = $user_row['user_role'];
                                                         }
                                                         ?>
                                                         <div class="form-gp">
-                                                            <input type="text" id="fullname" value="<?php echo $name; ?>" required>
+                                                            <input type="text" name="name" id="fullname" value="<?php echo $name; ?>" required>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errfn"></div>
                                                         </div>
                                                         <div class="form-gp">
-                                                            <input type="email" id="email" value="<?php echo $email; ?>" required>
+                                                            <input type="email" name="email" id="email" value="<?php echo $email; ?>" required>
                                                             <i class="ti-email"></i><br>
                                                             <div id="errem"></div>
                                                         </div>
                                                         <div class="form-gp">
-                                                            <input type="text" id="phone" value="<?php echo $phone; ?>" required>
+                                                            <input type="text" name="phone" id="phone" value="<?php echo $phone; ?>" required>
                                                             <i class="ti-mobile"></i><br>
                                                             <div id="errpn"></div>
                                                         </div>
@@ -101,7 +123,7 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                                                             <div id="errpn"></div>
                                                         </div>
                                                         <div class="submit-btn-area">
-                                                            <input class="btn btn-primary" id="form_submit" type="submit" value="Update Information">
+                                                            <input class="btn btn-primary" id="form_submit" name="form_submit" type="submit" value="Update Information">
                                                         </div>
                                                     </div>
                                                 </form>
@@ -157,64 +179,30 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                     var name = $('#fullname').val();
                     var email = $('#email').val();
                     var phone = $('#phone').val();
-                    var password = $('#password').val();
-                    var password2 = $('#password2').val();
                     var role = $('#user_role').val();
 
-                    if (name == '' || email == '' || phone == '' || password == '' || password2 == '') {
+                    if (name == '' || email == '' || phone == '') {
                         $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
                         return false;
                     }
-                    else if (name != '' || email != '' || phone != '' || password != '' || password2 != '') {
+                    else if (name != '' || email != '' || phone != '') {
                         $('#formErr').html('');
 
-                        var datastring = 'email='+email;
+                        var datastringg = 'email='+email;
 
                         $.ajax({
-                            url: 'ajax/email.php',
+                            url: 'ajax/emails.php',
                             method: 'post',
-                            data: datastring,
+                            data: datastringg,
                             success: function(msg) {
                                 if (msg == 1) {
                                     $('#errem').html('<div class="alert alert-danger"><p>Another User Exists With That Email</p></div>');
 
                                     return false;
 
-                                } else {
-                                    $('#errem').html('');
-                                    registerFinal();
                                 }
                             }
                         });
-
-
-                        if (password != password2) {
-                            $('#form_submit').attr('disabled', 'true');
-                            $('#perr').html('<div class="alert alert-danger"><p>Passwords Do Not Match</p></div>');
-                            $('#form_submit').removeAttr('disabled');
-                            return false;
-                        } else {
-                            $('#perr').html('');
-                        }
-
-
-                        var datastring = 'name='+name+'&email='+email+'&phone='+phone+'&password='+password+'&role='+role;
-
-                        function registerFinal() {
-
-                        $.ajax({
-                            url: 'ajax/register.php',
-                            method: 'post',
-                            data: datastring,
-                            success: function(msg) {
-                                if (msg == 1) {
-                                    window.location.replace('user.php');
-                                }else {
-                                    $('#loaderxy').html('<span class="alert alert-danger">Something Went wrong. Please try again</span>');
-                                }
-                            }
-                        });
-                    }
                     }
                     });
                 });

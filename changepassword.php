@@ -143,7 +143,6 @@ if (isset($_POST['form_submit'])) {
             $(document).ready(function(){
                 
                 $('#form_submit').click(function(){
-                    console.log(3);
 
                     var password = $('#password').val();
                     var password2 = $('#password2').val();

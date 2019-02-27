@@ -176,8 +176,11 @@ if (isset($_POST['submit_edt'])) {
     $url = $_POST['url'];
     $name = $_POST['fname'];
     $code = $_POST['fcode'];
+    $cpersonp = $_POST['cpersonp'];
+    $cperson = $_POST['cperson'];
+    $serverip = $_POST['server_ip'];
 
-    $query = mysqli_query($conn, "UPDATE facility set name = '$name', code = '$code' where id = '$id'");
+    $query = mysqli_query($conn, "UPDATE facility set name = '$name', code = '$code', contact_person = '$cperson', contact_person_phone = '$cpersonp', server_ip = '$serverip' where id = '$id'");
 
     $_SESSION['msg'] = '<span class="alert alert-success">Facility Edited Successfully.</span>';
     header("Location: $url ");
