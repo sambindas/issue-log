@@ -32,7 +32,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>eClinic Issues Log</title>
+    <title>eClat Healthcare Incident Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -91,10 +91,10 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                 <div class="row align-items-center">
                     <div class="col-sm-6">
                         <div class="breadcrumbs-area clearfix">
-                            <h4 class="page-title pull-left">Dashboard</h4>
+                            <h4 class="page-title pull-left">Dashboard</h4><br><br>
                             <ul class="breadcrumbs pull-left">
                                 <li><a href="index.html">Home</a></li>
-                                <li><span>Issues Log</span></li>
+                                <li><span>Incident Log</span></li>
                                 <li><span></span></li>
                                 <li><span></span></li>
                                 <a href="new.php" id="newissue" class="btn btn-primary btn-flat">New Issue</a>
@@ -129,7 +129,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                     <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title">Issues Log for <?php echo $noww; ?></h4>
+                                <h4 class="header-title">Incident Log for <?php echo $noww; ?></h4>
                                 <button class="btn btn-primary btn-flat" id="filters">Date Filter</button><br><Br>
                                 <form method="post" action="" id="filterid" style="display: none;">
                                     From
@@ -162,9 +162,16 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                 $status = $li_row['status'];   
                                                 $issue_id = $li_row['issue_id'];    
                                                 $issue = $li_row['issue'];
-
+                                                if ($li_row['user'] != "") {
+                                                $user = $li_row['user'];
+                                            } else {
+                                                $user = 'No One Yet';
+                                            }
+                                                $so = $li_row['support_officer'];
                                                 $date_one = $li_row['issue_date'];
                                                 $date_two = $li_row['resolution_date']; 
+                                                
+
 
                                                 $date_onets = strtotime($date_one);
                                                 $date_twots = strtotime($date_two);
@@ -192,12 +199,17 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                             echo 'style="background: #f95454"';
                                                         }
                                                 ?>>
-                                                    <td><?php echo $sn++; ?></td>
+                                                    <td><?php echo $li_row['issue_id']; ?></td>
                                                     <td><?php echo $li_row['facility'] ; ?></td>
                                                     <td><?php echo $li_row['issue_type'] ; ?></td>
-                                                    <td style="text-align: justify;"><?php echo "$issue" ?></td>
+                                                    <td id="dbl" ondblclick="smodal(<?php echo $issue_id ?>)" style="text-align: justify;"><?php echo '<a style="color: black;" tabindex="0" role="button" data-toggle="popover" data-trigger="focus" title="Assigned To" data-placement="bottom" data-content="'.$user.'">'.$issue.'</a>'; ?></td>
                                                     <td><?php echo $li_row['priority'] ; ?></td>
-                                                    <td><?php echo $li_row['support_officer'] ; ?></td>
+                                                    <td><?php 
+                                                    $soq = mysqli_query($conn, "SELECT * from user where user_id = '$so'");
+                                                    while ($soqq = mysqli_fetch_array($soq)) {
+                                                        echo $soqq['user_name'];
+                                                    }
+                                                    ?></td>
                                                     <td><?php echo $li_row['issue_date'] ; ?></td>
                                                     <td>
                                                         <?php
@@ -218,7 +230,10 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
-                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>                                                                        </div>
+                                                                            <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#re'.$issue_id.'">Reassign Incidence</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a>
+                                                                        </div>
                                                                     </div>';
                                                         } elseif ($status == 1) {
                                                             echo '  <div class="dropdown">
@@ -236,6 +251,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';
                                                         } elseif ($status == 2) {
@@ -252,6 +268,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';
                                                         } elseif ($status == 3) {
@@ -266,6 +283,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a data-toggle="modal" data-target="#comments'.$li_row['issue_id'].'" class="dropdown-item" href="#">View Comments</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';                                                            
                                                         } elseif ($status == 4) {
@@ -284,6 +302,8 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#re'.$issue_id.'">Reassign Incidence</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -303,7 +323,8 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="edit.php?issue_id='.$li_row['issue_id'].'">Edit Issue</a>
-                                                                        </div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#re'.$issue_id.'">Reassign Incidence</a>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                     </div>';
                                                                 }
                                                          elseif ($status == 6) {
@@ -319,6 +340,8 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -334,6 +357,8 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                         <div class="dropdown-divider"></div>
                                                                             <a class="dropdown-item" href="image.php?issue_id='.$li_row['issue_id'].'">Upload Media</a>
                                                                             <a class="dropdown-item" data-toggle="modal" href="#'.$issue_id.'media">View Media</a>
+                                                                        <div class="dropdown-divider"></div>
+                                                                            <a class="dropdown-item" data-toggle="modal" href="#logs'.$issue_id.'">View Issue Movement</a></div>
                                                                         </div>
                                                                     </div>';
                                                                 }
@@ -386,6 +411,42 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                             </div>
                                             <!-- Small modal modal end -->
 
+
+                                             <!-- reassign approval start -->
+                                            <div class="modal fade" id="re<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Reassign this issue to a user</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Currently assigned to</p>
+                                                            <?php echo '- '.$user; ?><br><br>
+                                                            <form method="post" action="processing.php">
+                                                                <select name="reassign" required>
+                                                                    <option value="">Select New User</option>
+                                                                    <?php
+                                                                    $fc = mysqli_query($conn, "SELECT * from user where user_name != '$user'");
+                                                                    while ($c_row = mysqli_fetch_array($fc)) {
+                                                                        echo '<option value="'.$c_row['user_name'].'">'.$c_row['user_name'].'</option>';
+                                                                    }
+                                                                    ?>
+                                                                </select><br><Br>
+                                                                <input type="checkbox" checked="checked" name="smail">
+                                                                Send Mail Notification<Br>
+                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_re">Reassign</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
                                              <!-- incomplete start -->
                                             <div class="modal fade" id="icm<?php echo $li_row['issue_id']; ?>">
                                                 <div class="modal-dialog">
@@ -419,16 +480,31 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
+                                                            <?php
+                                                            $s1 = $li_row['support_officer'];
+                                                            $s2 = $li_row['resolved_by'];
+
+                                                            $q1 = mysqli_query($conn, "SELECT * from user where user_id = '$s1'");
+                                                            while ($rq1 = mysqli_fetch_array($q1)) {
+                                                                $so1 = $rq1['user_name'];
+
+                                                                $q2 = mysqli_query($conn, "SELECT * from user where user_id = '$s2'");
+                                                                while ($rq2 = mysqli_fetch_array($q2)) {
+                                                                $so2 = $rq2['user_name'];
+
+                                                            ?>
                                                             <p><b>Facility:</b> <?php echo $li_row['facility']; ?></p>
                                                             <p><b>Type:</b> <?php echo $li_row['issue_type']; ?></p>
                                                             <p><b>Level:</b> <?php echo $li_row['issue_level']; ?></p>
-                                                            <p><b>priotity:</b> <?php echo $li_row['priority']; ?></p>
+                                                            <p><b>Priotity:</b> <?php echo $li_row['priority']; ?></p>
                                                             <p><b>Issue:</b> <?php echo $li_row['issue']; ?></p>
                                                             <p><b>Issue reported on:</b> <?php echo $li_row['issue_reported_on'] .' by '. $li_row['issue_client_reporter']; ?></p>
-                                                            <p><b>Submitted by:</b> <?php echo $li_row['support_officer'] .' on '. $li_row['issue_date']; ?></p>
-                                                            <p><b>Resolved by:</b> <?php echo $li_row['resolved_by'] .' on '. $li_row['resolution_date']; ?></p>
+                                                            <p><b>Submitted by:</b> <?php echo $so1 .' on '. $li_row['issue_date']; ?></p>
+                                                            <p><b>Resolved by:</b> <?php echo $so2 .' on '. $li_row['resolution_date']; ?></p>
                                                             <p><b>Info Relayed to:</b> <?php echo $li_row['info_relayed_to'] .' by '. $li_row['info_medium']; ?></p>
                                                             <p><b>Issue was resolved in:</b> <?php echo secondsToTime($final_date); ?></p>
+                                                            <?php }
+                                                            } ?>
                                                         </div>
                                                         <div class="modal-footer">
                                                         </div>
@@ -515,7 +591,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">View Issue Comments</h5>
+                                                            <h5 class="modal-title">View Incident Comments</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
@@ -523,29 +599,70 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                 $commentsq = mysqli_query($conn, "SELECT * from comments where issue_id = '$issue_id'");
                                                                 if (mysqli_num_rows($commentsq) >= 1) {
                                                                 while ($cq = mysqli_fetch_array($commentsq)) {
+                                                                    $uid = $cq['user'];
+                                                                    $ui = mysqli_query($conn, "SELECT * from user where user_id = '$uid'");
+                                                                    while ($rui = mysqli_fetch_array($ui)) {
+                                                                        $userrr = $rui['user_name'];
                                                                     $sstatus = $cq['status'];
                                                                     if ($sstatus == 0) {
-                                                                        echo '<b>'.$cq['user'].' - (Reopened):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Reopened):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 1) {
-                                                                        echo '<b>'.$cq['user'].' - (Done):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Done):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 2) {
-                                                                        echo '<b>'.$cq['user'].' - (Not An Issue):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Not An Issue):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 4) {
-                                                                        echo '<b>'.$cq['user'].' - (Incomplete):</b> '.$cq['comment']. ' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Incomplete):</b> '.$cq['comment']. ' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 5) {
-                                                                        echo '<b>'.$cq['user'].' - (Not Clear):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Not Clear):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 6) {
-                                                                        echo '<b>'.$cq['user'].' - (Require Approval):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Require Approval):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 7) {
-                                                                        echo '<b>'.$cq['user'].' - (Disapproved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Disapproved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } elseif ($sstatus == 8) {
-                                                                        echo '<b>'.$cq['user'].' - (Approved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - (Approved):</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
                                                                     } else {
-                                                                        echo '<b>'.$cq['user'].' - :</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                        echo '<b>'.$userrr.' - :</b> '.$cq['comment'].' <i> @ '.$cq['date_added'].'</i><br>'; 
+                                                                    }
                                                                     }
                                                                 }
                                                             }else {
                                                                 echo "<p>No Comments For This Issue</p>";
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+
+                                            <!-- logs modal start -->
+
+                                            <div class="modal fade bd-example-modal-sm" id="logs<?php echo $li_row['issue_id']; ?>">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">View Incident Movement</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <?php
+                                                                $logq = mysqli_query($conn, "SELECT * from movement where issue_id = '$issue_id'");
+                                                                if (mysqli_num_rows($logq) >= 1) {
+                                                                while ($lq = mysqli_fetch_array($logq)) {
+                                                                    $done_by = $lq['done_by'];
+                                                                    $done_at = $lq['done_at'];
+                                                                    $movement = $lq['movement'];
+                                                                    $n = 1;
+
+                                                                    $mq = mysqli_query($conn, "SELECT * from user where user_id = '$done_by'");
+                                                                    while ($rmq = mysqli_fetch_array($mq)) {
+                                                                        $mu = $rmq['user_name'];
+                                                                    echo '<b>'.$movement.' </b> - '.$mu.' <i> @ '.$done_at.'</i><br>'; 
+                                                                    }
+                                                            } } else {
+                                                                echo "<p>No Movements For This Issue</p>";
                                                             }
                                                             ?>
                                                         </div>
@@ -579,7 +696,6 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                 </div>
                                             </div>
                                             <!-- Small modal modal end -->
-
                                             <!-- approved modal start -->
                                             <div class="modal fade" id="app<?php echo $li_row['issue_id']; ?>">
                                                 <div class="modal-dialog">
@@ -634,7 +750,7 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title">Confirm Issue <?php echo $sn-1; ?> Has Been Solved</h5>
+                                                            <h5 class="modal-title">Confirm Issue <?php echo $issue_id; ?> Has Been Solved</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
@@ -646,7 +762,13 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                                                                                 <div class="col-sm-4">           
                                                                                     <div class="form-gp">
                                                                                         <h4 class="header-title mb-0">Resolved By</h4>
-                                                                                        <p><?php echo $li_row['resolved_by'] .'<br>'. $li_row['resolution_date'] ; ?></p>
+                                                                                        <p><?php
+                                                                                        $rrb = $li_row['resolved_by'];
+                                                                                        $rb = mysqli_query($conn, "SELECT * from user where user_id = '$rrb'");
+                                                                                        while ($rbr = mysqli_fetch_array($rb)) {
+                                                                                            echo $rbr['user_name'] .'<br>'. $li_row['resolution_date'] ; } ?>
+                                                                                        
+                                                                                         </p>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div class="col-sm-4">           
@@ -683,22 +805,6 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
                         </div>
                     </div>
                     <!-- Primary table end -->
-
-                    <!-- Large modal start -->
-                    <!-- Large modal -->
-                    <div class="newissue modal fade bd-example-modal-lg">
-                        <div class="modal-dialog modal-lg">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Submit an Issue</h5>
-                                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-                                </div>
-                                <div class="modal-body">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Large modal modal end -->
                 </div>
             </div>
         </div>
@@ -724,10 +830,16 @@ $il = mysqli_query($conn, "SELECT * from issue where month = '$noww'");
     <script type="text/javascript">
         $(document).ready(function(){
             $('#filters').click(function(){
-                console.log(23);
                 $('#filterid').toggle();
             });
         });
+    </script>
+    <script>
+    function smodal(id) {
+        console.log(id);
+        var t = "con"+id;
+      document.getElementById(t).showModal();
+    }
     </script>
     <script type="text/javascript">
         $(document).ready(function(){

@@ -17,7 +17,7 @@ $editqq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'"
 $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'");
 
 while ($t = mysqli_fetch_array($editqq)) {
-    if ($t['support_officer'] != $_SESSION['name'] || $t['status'] == 3) {
+    if ($t['support_officer'] != $_SESSION['id'] || $t['status'] == 3) {
 
      $_SESSION['msg'] = '<span class="alert alert-danger">Cannot Edit Another Users Issue.</span>';
     header("Location: index.php ");

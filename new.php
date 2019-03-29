@@ -57,7 +57,7 @@ $noww = date('M Y');
                             <form method="post" action="processing.php" name="issue_form" id="issue_form" enctype="multipart/form-data">
                                 <div class="login-form-body">
                                     <div class="row">
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Facility</h4>
                                                 <select name="facility" class="custome-select border-0 pr-3" required>
@@ -71,10 +71,10 @@ $noww = date('M Y');
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <div class="form-gp">
                                                 <h4 class="header-title mb-0">Type</h4>
-                                                <select name = "type" class="custome-select border-0 pr-3" required>
+                                                <select name = "type" id="type" class="custome-select border-0 pr-3" required>
                                                     <option value="" selected="">Select One</option>
                                                     <option value="Issue">Issue</option>
                                                     <option value="Request">Request</option>
@@ -82,16 +82,21 @@ $noww = date('M Y');
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-sm-4">
+                                        <div class="col-sm-3">
                                             <div class="form-gp">
                                                 <h4  class="header-title mb-0">Issue Level</h4>
-                                                <select name="il" id="il" class="custome-select border-0 pr-3" required>
-                                                    <option value="" selected="">Select One</option>
-                                                    <option value="1">Level One (1 hr - 24 hrs)</option>
-                                                    <option value="2">Level Two (24 hrs - 1 wk)</option>
-                                                    <option value="3">Level Three (1 wk - 1mth)</option>
-                                                    <option value="4">Level Four (TBD)</option>
+                                                <select name="il" id="level" class="custome-select border-0 pr-3" required>
+                                                    <option value="" selected="">Select Type First</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <div class="form-gp">
+                                                <h4  class="header-title mb-0">Assign To</h4>
+                                                <select name="assign" id="assign" class="custome-select border-0 pr-3">
+                                                    <option value="">Select Level First</option>
+                                                </select>
+                                                <input style="display: none;" id="smail" type="checkbox" name="smail" title="Check to send a mail">
                                             </div>
                                         </div>
                                     </div>
@@ -194,7 +199,64 @@ $noww = date('M Y');
             }
          });
     </script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+    $('#type').on('change',function(){
+        var type = $(this).val();
+        if(type){
+            $.ajax({
+                type:'POST',
+                url:'ajax/ajaxData.php',
+                data:'type='+type,
+                success:function(html){
+                    $('#level').html(html);
+                    $('#assign').html('<option value="">Select Level first</option>'); 
+                }
+            }); 
+        }else{
+            $('#level').html('<option value="">Select Type first</option>');
+            $('#assign').html('<option value="">Select Level first</option>'); 
+        }
+    });
 
+    $('#level').on('change',function(){
+        var level = $(this).val();
+        if (level == 1) {
+            var levell = 'Support Officer';
+        } else if (level == 2) {
+            var levell = 'Developer';
+        } else if (level == 3) {
+            var levell = 'Developer';
+        } else if (level == 4) {
+            var levell = 'Developer';
+        }
+        if(levell){
+            $.ajax({
+                type:'POST',
+                url:'ajax/ajaxData.php',
+                data:'level='+levell,
+                success:function(html){
+                    $('#assign').html(html);
+                }
+            }); 
+        }else{
+            $('#assign').html('<option value="">Select Level first</option>'); 
+        }
+    });
+    });
+    </script>
+    <script>
+        $(document).ready(function(){
+            $('#assign').on('change',function(){
+                var drop = $('#smail');
+                if (drop.val() == '') {
+                    drop.hide();
+                } else {
+                    drop.show();
+                }
+            });
+        });
+    </script>
     <!-- Start datatable js -->
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js"></script>

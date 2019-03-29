@@ -4,6 +4,8 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+error_reporting(E_ALL); 
+ini_set('display_errors', 1);
 
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
@@ -60,7 +62,7 @@ if (isset($_POST['delete_f'])) {
                 <div class="row align-items-center">
                     <div class="col-sm-6">
                         <div class="breadcrumbs-area clearfix">
-                            <h4 class="page-title pull-left">Dashboard</h4>
+                            <h4 class="page-title pull-left">Dashboard</h4><br><br>
                             <ul class="breadcrumbs pull-left">
                                 <li><a href="index.php">Home</a></li>
                                 <li><span>Manage / </span></li>
@@ -83,8 +85,9 @@ if (isset($_POST['delete_f'])) {
                             <img class="avatar user-thumb" src="assets/images/author/avatar.png" alt="avatar">
                             <h4 class="user-name dropdown-toggle" data-toggle="dropdown"><?php echo $_SESSION['name']; ?> <i class="fa fa-angle-down"></i></h4>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#">Message</a>
-                                <a class="dropdown-item" href="#">Settings</a>
+                                <a class="dropdown-item" href="changepassword.php">Change Password</a>
+                                <a class="dropdown-item" href="settings.php">Settings</a>
+				<a class="dropdown-item" href="help.php">Help</a>
                                 <a class="dropdown-item" href="logout.php">Log Out</a>
                             </div>
                         </div>
@@ -98,7 +101,7 @@ if (isset($_POST['delete_f'])) {
                     <div class="col-12 mt-5">
                         <div class="card">
                             <div class="card-body">
-                                <h4 class="header-title">Users</h4>
+                                <h4 class="header-title">Facilities</h4>
                                 <div class="data-tables datatable-primary">
                                     <div id="my_table">
                                         <table id="dataTable2" class="text-center table table-hover">
@@ -108,7 +111,9 @@ if (isset($_POST['delete_f'])) {
                                                     <th>Facility Name</th>
                                                     <th>Contact Person</th>
                                                     <th>Contact Person Phone</th>
-                                                    <th>Server IP</th>
+                                                    <th>Email</th>
+                                                    <th>Local IP</th>
+                                                    <th>Online URL</th>
                                                     <th>Action</th>
                                                     <th></th>
                                                 </tr>
@@ -125,7 +130,9 @@ if (isset($_POST['delete_f'])) {
                                                     <td><?php echo $li_row['name'] ; ?></td>
                                                     <td><?php echo $li_row['contact_person'] ; ?></td>
                                                     <td><?php echo $li_row['contact_person_phone'] ; ?></td>
+                                                    <td><?php echo $li_row['email'] ; ?></td>
                                                     <td><?php echo $li_row['server_ip'] ; ?></td>
+                                                    <td><?php echo $li_row['online_url'] ; ?></td>
                                                     <td><div class="dropdown">
                                                             <button class="btn btn-xs btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             Action
@@ -143,26 +150,66 @@ if (isset($_POST['delete_f'])) {
 
                                             <!-- edit modal start -->
                                             <div class="modal fade" id="edt<?php echo $li_row['id']; ?>">
-                                                <div class="modal-dialog modal-sm">
+                                                <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title">Edit Facility</h5>
                                                             <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <p>Edit this Facility</p>
-                                                            <form method="post" action="processing.php">
-                                                                <input type="text" placeholder="Enter Facility Code" name="fcode" value="<?php echo $li_row['code']; ?>"><Br><br>
-                                                                <input type="text" placeholder="Facility Name" name="fname" value="<?php echo $li_row['name']; ?>"><br><br>
-                                                                <input type="text" placeholder="Contact Person" name="cperson" value="<?php echo $li_row['contact_person']; ?>"><br><br>
-                                                                <input type="text" placeholder="Contact Person's Phone" name="cpersonp" value="<?php echo $li_row['contact_person_phone']; ?>"><br><br>
-                                                                <input type="text" placeholder="Server IP" name="server_ip" value="<?php echo $li_row['server_ip']; ?>">
-                                                                <input type="hidden" name="id" value="<?php echo $li_row['id']; ?>">
-                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
-                                                                <br><button type="submit" class="btn btn-primary" name="submit_edt">Edit</button>
-                                                            </form><br>
-                                                        </div>
-                                                        <div class="modal-footer">
+                                                            <!-- login area start -->
+                                                            <div class="login-area">
+                                                                <div class="container">
+                                                                        <form action="processing.php" method="post">
+                                                                            <div class="login-form-head">
+                                                                                <p id="formErr"></p>
+                                                                            </div>
+                                                                            <div class="login-form-body">
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" placeholder="Enter Facility Code" name="fcode" value="<?php echo $li_row['code']; ?>" required>
+                                                                                    
+                                                                                    <div id="errfc"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" name="fname" placeholder="Facility Name" value="<?php echo $li_row['name']; ?>" required>
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" name="cperson" placeholder="Contact Person" value="<?php echo $li_row['contact_person']; ?>">
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" name="cpersonp" placeholder="Contact Person's Phone" value="<?php echo $li_row['contact_person_phone']; ?>">
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="email" name="email" placeholder="Email" value="<?php echo $li_row['email']; ?>">
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" name="server_ip" value="<?php echo $li_row['server_ip']; ?>" placeholder="Local IP">
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <div class="form-gp">
+                                                                                    <input type="text" name="online_url" placeholder="Online URL" value="<?php echo $li_row['online_url']; ?>">
+                                                                                    
+                                                                                    <div id="errfn"></div>
+                                                                                </div>
+                                                                                <input type="hidden" name="id" value="<?php echo $li_row['id']; ?>">
+                                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                                <div class="submit-btn-area">
+                                                                                    <input class="btn btn-primary" name="submit_edt" type="submit" value="Submit">
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                </div>
+                                                            </div>
+                                                            <!-- login area end -->
                                                         </div>
                                                     </div>
                                                 </div>
@@ -243,8 +290,20 @@ if (isset($_POST['delete_f'])) {
                                                             <div id="errfn"></div>
                                                         </div>
                                                         <div class="form-gp">
-                                                            <label for="exampleInputName1">Server IP</label>
+                                                            <label for="exampleInputName1">Email</label>
+                                                            <input type="text" id="email" required>
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
+                                                            <label for="exampleInputName1">Local IP</label>
                                                             <input type="text" id="serverip">
+                                                            <i class="ti-user"></i><br>
+                                                            <div id="errfn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
+                                                            <label for="exampleInputName1">Online URL</label>
+                                                            <input type="text" id="online_url">
                                                             <i class="ti-user"></i><br>
                                                             <div id="errfn"></div>
                                                         </div>
@@ -305,6 +364,8 @@ if (isset($_POST['delete_f'])) {
                     var cperson = $('#cperson').val();
                     var cpersonp = $('#cpersonp').val();
                     var serverip = $('#serverip').val();
+                    var online_url = $('#online_url').val();
+                    var email = $('#email').val();
 
                     if (name == '' || code == '' || cperson == '' || cpersonp == '') {
                         $('#formErr').html('<span class="alert alert-danger">Please Fill Required Fields</span>');
@@ -332,7 +393,7 @@ if (isset($_POST['delete_f'])) {
                             }
                         });
 
-                        var datastringg = 'name='+name+'&code='+code+'&cperson='+cperson+'&cpersonp='+cpersonp+'&serverip='+serverip;
+                        var datastringg = 'name='+name+'&code='+code+'&cperson='+cperson+'&cpersonp='+cpersonp+'&serverip='+serverip+'&online_url='+online_url+'&email='+email;
 
                         function registerFinal() {
 

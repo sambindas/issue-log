@@ -13,6 +13,7 @@ require '../connection.php';
 		if ($row = mysqli_fetch_array($query)) {
 			$_SESSION['name'] = $row['user_name'];
 			$_SESSION['email'] = $row['email'];
+			$_SESSION['id'] = $row['user_id'];
 			echo "1";
 		}
 		

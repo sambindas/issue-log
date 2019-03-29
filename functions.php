@@ -1,7 +1,7 @@
 <?php
 $conn = mysqli_connect("localhost", "root", "", "laundry");
 function checkUserSession() {
-    if (!isset($_SESSION['email']) && !isset($_SESSION['name'])) {
+    if (!isset($_SESSION['email']) && !isset($_SESSION['name']) && !isset($_SESSION['id'])) {
         header("Location: login.php");
     } else {
         $email = $_SESSION['email'];

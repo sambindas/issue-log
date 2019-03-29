@@ -118,6 +118,7 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                                                                 <option value=""> Select One</option>
                                                                 <option <?php if ($role == 'Developer') { echo 'selected'; } ?> value="Developer">Developer</option>
                                                                 <option <?php if ($role == 'Support Officer') { echo 'selected'; } ?> value="Support Officer">Support Officer</option>
+                                                                <option <?php if ($role == 'Others') { echo 'selected'; } ?> value="Support Officer">Others</option>
                                                             </select>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errpn"></div>

@@ -15,15 +15,43 @@ if (isset($_POST['submit_issue'])) {
     $iro = $_POST['iro'];
     $irod = date('d-m-Y @ H:i:s', strtotime($iro));
     $ad = $_POST['ad'];
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $priority = $_POST['priority'];
     $date = date('d-m-Y H:i:s');
     $fdate = date('Y-m-d');
     $url = $_POST['url'];
     $month = date('M Y');
+    $user = $_POST['assign'];
+    $checked = $_POST['smail'];
 
-        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, fissue_date, issue_client_reporter, affected_dept, support_officer, priority, status, month, issue_reported_on)
-         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$fdate', '$icr', '$ad', '$so', '$priority', 0, '$month', '$irod')");
+        $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, fissue_date, issue_client_reporter, affected_dept, support_officer, priority, status, month, issue_reported_on, user)
+         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$fdate', '$icr', '$ad', '$so', '$priority', 0, '$month', '$irod', '$user')");
+        $last_id = mysqli_insert_id($conn);
+        
+        if ($insert) {
+            $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$last_id', '$so', '$date', 'Issue was submitted')");
+        }
+        if ($user != "") {
+            if ($checked != "") {
+                $u = mysqli_query($conn, "SELECT * from user where user_name = '$user'");
+                while ($rr = mysqli_fetch_array($u)) {
+                    $email = $rr['email'];
+                }
+                $rrr = strtok($user, " ");
+                $message = "Hello $rrr,\n\nAn issue has been assigned to you on eClat Healthcare Incidence Log by $so, please Log in and Check. \n\nBest Regards.";
+
+                $headers = 'From: femi@eclathealthcare.com';
+
+                // Message lines should not exceed 70 characters (PHP rule), so wrap it
+                $message = wordwrap($message, 70);
+                // Send Mail By PHP Mail Function
+                mail($email, "An Issue has been reassigned to you", $message, $headers);
+                $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully and mail sent to '.$email.'.</span>';
+                header("Location: index.php ");
+                exit();
+            }
+        }
+        
 
         $_SESSION['msg'] = '<span class="alert alert-success">Issue Submitted Successfully.</span>';
         header("Location: index.php ");
@@ -40,18 +68,58 @@ if (isset($_POST['edit_issue'])) {
     $iro = $_POST['iro'];
     $irod = date('d-m-Y @ H:i:s', strtotime($iro));
     $ad = $_POST['ad'];
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $priority = $_POST['priority'];
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
+    $action = "Issue was Edited";
 
         $insert = mysqli_query($conn, "UPDATE issue set facility = '$facility', issue_type = '$type', issue_level = '$il', issue = '$issue', issue_date = '$date',
          issue_client_reporter = '$icr', affected_dept = '$ad', support_officer = '$so', priority = '$priority', issue_reported_on = '$irod' where issue_id = '$issue_id'");
-        
         if ($insert) {
-        
+            $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', '$action')");
+        }
+        if ($log) {
 
         $_SESSION['msg'] = '<span class="alert alert-success">Issue Edited Successfully.</span>';
+        header("Location: index.php ");
+}
+    }
+
+if (isset($_POST['submit_re'])) {
+    $issue_id = $_POST['issue_id'];
+    $reassign = $_POST['reassign'];
+    $url = $_POST['url'];
+    $n = $_SESSION['name'];
+    $date = date('d-m-Y H:i:s');
+    $so = $_SESSION['id'];
+    $u = mysqli_query($conn, "SELECT * from user where user_name = '$reassign'");
+    while ($rr = mysqli_fetch_array($u)) {
+        $email = $rr['email'];
+    }
+        $insert = mysqli_query($conn, "UPDATE issue set user = '$reassign' where issue_id = '$issue_id'");
+
+        if ($insert) {
+            $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was re-assigned to $reassign')");
+        }
+        
+        if ($log) {
+        if (isset($_POST['smail'])) {
+            $rrr = strtok($reassign, " ");
+            $message = "Hello $rrr,\n\nIssue No. $issue_id has been re-assigned to you on eClat Healthcare Incidence Log by $n. Please log in and check.\n\nBest Regards. ";
+
+            $headers = 'From: femi@eclathealthcare.com';
+
+            // Message lines should not exceed 70 characters (PHP rule), so wrap it
+            $message = wordwrap($message, 70);
+            // Send Mail By PHP Mail Function
+            mail($email, "An Issue has been reassigned to you", $message, $headers);
+            $_SESSION['msg'] = '<span class="alert alert-success">Issue Reassigned Successfully and mail sent to '.$email.'.</span>';
+            header("Location: index.php ");
+            exit();
+        }
+
+        $_SESSION['msg'] = '<span class="alert alert-success">Issue Reassigned Successfully.</span>';
         header("Location: index.php ");
 }
     }
@@ -63,7 +131,7 @@ if (isset($_POST['submit_media'])) {
         $dir = 'media/';
         $url = $_POST['url'];
         $issue_id = $_POST['issue_id'];
-        $so = $_SESSION['name'];
+        $so = $_SESSION['id'];
         $date = date('d-m-Y H:i:s');
 
         $caption = $_POST['caption'];
@@ -90,6 +158,7 @@ if (isset($_POST['submit_media'])) {
         $query_image = "INSERT INTO media (media_name, issue_id, user, caption, date_added) VALUES ('$fileName','$issue_id','$so', '$caption', '$date')";
         
         if(mysqli_query($conn, $query_image)){
+            $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Media was submitted')");
             $_SESSION['msg'] = '<span class="alert alert-success">Media Uploaded Successfully</span>';
             header("Location: index.php");
         }      
@@ -100,14 +169,16 @@ if (isset($_POST['submit_media'])) {
 
 if (isset($_POST['submit_done'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['dcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 1, resolution_date = '$date', resolved_by = '$so' where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was marked as done')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 1) ");
@@ -122,7 +193,7 @@ if (isset($_POST['submit_done'])) {
 
 if (isset($_POST['submit_app'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
@@ -130,7 +201,9 @@ if (isset($_POST['submit_app'])) {
 
 
     $query = mysqli_query($conn, "UPDATE issue set status = 0 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was approved.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 8) ");
@@ -146,7 +219,7 @@ if (isset($_POST['submit_app'])) {
 
 if (isset($_POST['submit_dapp'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
@@ -154,7 +227,9 @@ if (isset($_POST['submit_dapp'])) {
 
 
     $query = mysqli_query($conn, "UPDATE issue set status = 7 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was not approved.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 7) ");
@@ -179,9 +254,11 @@ if (isset($_POST['submit_edt'])) {
     $cpersonp = $_POST['cpersonp'];
     $cperson = $_POST['cperson'];
     $serverip = $_POST['server_ip'];
+    $online_url = $_POST['online_url'];
+    $email = $_POST['email'];
 
-    $query = mysqli_query($conn, "UPDATE facility set name = '$name', code = '$code', contact_person = '$cperson', contact_person_phone = '$cpersonp', server_ip = '$serverip' where id = '$id'");
-
+    $query = mysqli_query($conn, "UPDATE facility set name = '$name', code = '$code', contact_person = '$cperson', contact_person_phone = '$cpersonp', email = '$email', server_ip = '$serverip', online_url = '$online_url' where id = '$id'");
+    
     $_SESSION['msg'] = '<span class="alert alert-success">Facility Edited Successfully.</span>';
     header("Location: $url ");
 
@@ -189,15 +266,17 @@ if (isset($_POST['submit_edt'])) {
 
 if (isset($_POST['confirmed'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
-    $date = date('d-m-Y');
+    $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
     $irt = mysqli_real_escape_string($conn, $_POST['irt']);
     $im = mysqli_real_escape_string($conn, $_POST['im']);
 
     $query = mysqli_query($conn, "UPDATE issue set status = 3, info_relayed_to = '$irt', info_medium = '$im' where issue_id = '$issue_id'");
-    
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was confirmed as solved.')");
+    }
 
     $_SESSION['msg'] = '<span class="alert alert-success">Issue Confirmed Successfully.</span>';
     header("Location: $url ");
@@ -206,14 +285,16 @@ if (isset($_POST['confirmed'])) {
 
 if (isset($_POST['submit_icm'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['dcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 4 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was marked as incomplete.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 4) ");
@@ -228,14 +309,16 @@ if (isset($_POST['submit_icm'])) {
 
 if (isset($_POST['submit_nai'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['ncomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 2 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was marked as not an issue.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 2) ");
@@ -250,7 +333,7 @@ if (isset($_POST['submit_nai'])) {
 
 if (isset($_POST['submit_comm'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['comments']);
     $date = date('d-m-Y H:i:s');
@@ -264,14 +347,16 @@ if (isset($_POST['submit_comm'])) {
 
 if (isset($_POST['submit_noc'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['dcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 5 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was marked as not clear.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 5) ");
@@ -286,14 +371,16 @@ if (isset($_POST['submit_noc'])) {
 
 if (isset($_POST['submit_req'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['ncomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 6 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was marked for approval.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 6) ");
@@ -308,14 +395,16 @@ if (isset($_POST['submit_req'])) {
 
 if (isset($_POST['submit_reo'])) {
 
-    $so = $_SESSION['name'];
+    $so = $_SESSION['id'];
     $issue_id = $_POST['issue_id'];
     $comments = mysqli_real_escape_string($conn, $_POST['rcomments']);
     $date = date('d-m-Y H:i:s');
     $url = $_POST['url'];
 
     $query = mysqli_query($conn, "UPDATE issue set status = 0 where issue_id = '$issue_id'");
-
+    if ($query) {
+        $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Issue was reopened.')");
+    }
     if ($comments != "") {
 
     $query2 = mysqli_query($conn, "INSERT into comments (issue_id, comment, user, date_added, status) values ('$issue_id', '$comments', '$so', '$date', 0) ");
@@ -362,11 +451,38 @@ if (isset($_POST['submit_media2'])) {
         $query_image = "INSERT INTO media (media_name, issue_id, user, caption, date_added) VALUES ('$fileName','$issue_id','$so', '$caption', '$date')";
         
         if(mysqli_query($conn, $query_image)){
+            $log = mysqli_query($conn, "INSERT into movement (issue_id, done_by, done_at, movement) values ('$issue_id', '$so', '$date', 'Media was submitted')");
             $_SESSION['msg'] = '<span class="alert alert-success">Media Uploaded Successfully. Upload Another</span>';
             header("Location: $url");
         }      
     }
 
     }
+}
+
+if (isset($_POST['submit_dact'])) {
+
+    $so = $_SESSION['id'];
+    $user_id = $_POST['user_id'];
+    $url = $_POST['url'];
+
+    $query = mysqli_query($conn, "UPDATE user set status = 0 where user_id = '$user_id'");
+    
+    $_SESSION['msg'] = '<span class="alert alert-success">User Deactivated Successfully.</span>';
+    header("Location: $url ");
+
+}
+
+if (isset($_POST['submit_act'])) {
+
+    $so = $_SESSION['id'];
+    $user_id = $_POST['user_id'];
+    $url = $_POST['url'];
+
+    $query = mysqli_query($conn, "UPDATE user set status = 1 where user_id = '$user_id'");
+    
+    $_SESSION['msg'] = '<span class="alert alert-success">User Activated Successfully.</span>';
+    header("Location: $url ");
+
 }
 ?>

@@ -128,9 +128,9 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                                                 <?php
                                                                 if ($li_row['status']==0) {
-                                                                    echo '<a class="dropdown-item" href="#">Activate</a>';
+                                                                    echo '<a class="dropdown-item" data-toggle="modal" data-target="#act'.$li_row["user_id"].'" href="#">Activate</a>';
                                                                 } else {
-                                                                    echo '<a data-toggle="modal" data-target="#act'.$li_row["user_id"].'" class="dropdown-item" href="#">Deactivate</a>';
+                                                                    echo '<a data-toggle="modal" data-target="#dact'.$li_row["user_id"].'" class="dropdown-item" href="#">Deactivate</a>';
                                                                 }
                                                                 ?>
                                                             </div>
@@ -139,8 +139,8 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                     <td></td>
                                                 </tr>
 
-                                            <!-- activate modal start -->
-                                            <div class="modal fade" id="act<?php echo $li_row['user_id']; ?>">
+                                            <!-- deactivate modal start -->
+                                            <div class="modal fade" id="dact<?php echo $li_row['user_id']; ?>">
                                                 <div class="modal-dialog modal-sm">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
@@ -150,9 +150,31 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                         <div class="modal-body">
                                                             <p>Are you sure you want to Deactivate?</p>
                                                             <form method="post" action="processing.php">
-                                                                <input type="hidden" name="issue_id" value="<?php echo $li_row['issue_id']; ?>"><br>
+                                                                <input type="hidden" name="user_id" value="<?php echo $li_row['user_id']; ?>"><br>
                                                                 <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
-                                                                <br><button type="submit" class="btn btn-primary" name="submit_reo">Deactivate</button>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_dact">Deactivate</button>
+                                                            </form><br>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Small modal modal end -->
+                                            <!-- activate modal start -->
+                                            <div class="modal fade" id="act<?php echo $li_row['user_id']; ?>">
+                                                <div class="modal-dialog modal-sm">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Activate User</h5>
+                                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to Activate?</p>
+                                                            <form method="post" action="processing.php">
+                                                                <input type="hidden" name="user_id" value="<?php echo $li_row['user_id']; ?>"><br>
+                                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                                <br><button type="submit" class="btn btn-primary" name="submit_act">Activate</button>
                                                             </form><br>
                                                         </div>
                                                         <div class="modal-footer">
@@ -215,6 +237,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                                 <option></option>
                                                                 <option value="Developer">Developer</option>
                                                                 <option value="Support Officer">Support Officer</option>
+                                                                <option value="Others">Others</option>
                                                             </select>
                                                             <i class="ti-user"></i><br>
                                                             <div id="errpn"></div>

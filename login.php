@@ -43,7 +43,7 @@ header("Location: index.php");
             <div class="login-box ptb--100">
                 <form action="javascript:;">
                     <div class="login-form-head">
-                        <h4>Sign In</h4>
+                        <img src="logo.jpeg"><br><br>
                         <p>Sign in to use the Issue log</p><br>
                         <p id="formErr"></p>
                     </div>

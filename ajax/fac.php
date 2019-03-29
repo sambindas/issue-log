@@ -9,9 +9,11 @@ require '../connection.php';
 	$cperson = mysqli_real_escape_string($conn, $_POST['cperson']);
 	$cpersonp = mysqli_real_escape_string($conn, $_POST['cpersonp']);
 	$serverip = mysqli_real_escape_string($conn, $_POST['serverip']);
+	$online_url = mysqli_real_escape_string($conn, $_POST['online_url']);
+	$email = mysqli_real_escape_string($conn, $_POST['email']);
 
-	$query = mysqli_query($conn, "INSERT into facility (name, code, contact_person, contact_person_phone, server_ip) 
-								values ('$name', '$code', '$cperson', '$cpersonp', '$serverip')");
+	$query = mysqli_query($conn, "INSERT into facility (name, code, contact_person, contact_person_phone, server_ip, online_url, email) 
+								values ('$name', '$code', '$cperson', '$cpersonp', '$serverip', '$online_url', '$email')");
 
 	if ($query) {
 		$_SESSION['msg'] = '<span class="alert alert-success">Facility Added Successfully</span>';
