@@ -1,3 +1,30 @@
+<?php
+session_start();
+require 'connection.php';
+require 'functions.php';
+
+$token = substr(str_shuffle(str_repeat("0123456789abcdefghijklmnopqrstuvwxyz", 5)), 0, 15);
+
+if (isset($_POST['emaill'])) {
+    $email = $_POST['email'];
+
+    $query = mysqli_query($conn, "SELECT * from user where email = '$email'");
+    if (mysqli_num_rows($query) > 0) {
+        $update = mysqli_query($conn, "UPDATE user set token = '$token' where email = '$email'");
+        $msg = '<span class="alert alert-success">Please Check Your Email For Further Instructions</span>';
+        $subject = 'Incident Log Password Reset';
+        $message = 'You requested to reset your Password on eClat Healthcare Incident Log, Please click on the link below to proceed.
+                    <br><br> incident-log.eclathealthcare.com/reset.php?token='.$token.' <Br><br>
+                    If you did not request for a Password Reset, simply ignore this message.
+        ';
+        sendMail($email, 'User', $subject, $message, $msg, 'reset-pass.php');
+    } else {
+        $_SESSION['msg'] = '<span class="alert alert-danger">No Account Associated With That Email</span>';
+        header("Location: reset-pass.php");
+        exit();
+    }
+}
+?>
 <!doctype html>
 <html class="no-js" lang="en">
 
@@ -33,19 +60,25 @@
     <div class="login-area">
         <div class="container">
             <div class="login-box ptb--100">
-                <form>
+                <form action="" method="post">
                     <div class="login-form-head">
                         <h4>Reset Password</h4>
-                        <p>Hey! Reset Your Password and comeback again</p>
+                        <p>Hey! Reset Your Password and comeback again</p><br>
+                    <?php 
+                    if (isset($_SESSION['msg'])) {
+                        echo $_SESSION['msg'];
+                        unset($_SESSION['msg']);
+                    }
+                    ?>
                     </div>
                     <div class="login-form-body">
                         <div class="form-gp">
                             <label for="exampleInputPassword1">Input Your Email</label>
-                            <input type="email" required id="email">
+                            <input type="email" required name="email" id="email">
                             <i class="ti-lock"></i>
                         </div>
                         <div class="submit-btn-area mt-5">
-                            <button id="form_submit" type="submit">Reset <i class="ti-arrow-right"></i></button>
+                            <button id="form_submit" name="emaill" type="submit">Reset <i class="ti-arrow-right"></i></button>
                         </div>
                     </div>
                 </form>
@@ -67,36 +100,6 @@
     <!-- others plugins -->
     <script src="assets/js/plugins.js"></script>
     <script src="assets/js/scripts.js"></script>
-    <script type="text/javascript">
-        
-        $(document).ready(function(){
-
-            $('#form_submit').click(function(){
-                $(this).fadeOut();
-                var email = $('#email').val();
-
-                    var datastring = 'email='+email;
-
-                    $.ajax({
-                            url: 'ajax/email.php',
-                            method: 'post',
-                            data: datastring,
-                            success: function(msg) {
-                                if (msg == 1) {
-                                    $('#errem').html('<div class="alert alert-danger"><p>Another User Exists With That Email</p></div>');
-
-                                    return false;
-
-                                } else {
-                                    $('#errem').html('');
-                                    registerFinal();
-                                }
-                            }
-                        });
-                
-            });
-        });
-    </script>
 </body>
 
 </html>

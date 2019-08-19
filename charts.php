@@ -3,6 +3,11 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+if ($_SESSION['logged_user'] == 'client') {
+    header('Location: clientindex.php');
+}
+
+//time average
 
 $sum_issue = 0;
 $sum_res = 0;
@@ -25,8 +30,15 @@ $fd = $final / $fnumber;
 $avg_resolve_time = secondsToTime($fd);
 
 $result = mysqli_query($conn, "SELECT count(issue_id) as numberr, facility from issue group by facility");
-$line = mysqli_query($conn, "SELECT count(issue_id) as numberrrr, month from issue group by month");
+$line = mysqli_query($conn, "SELECT count(issue_id) as numberrrr, month, issue_id from issue group by month order by issue_id asc");
 $userq = mysqli_query($conn, "SELECT count(issue.issue_id) as numberrr, issue.support_officer, user.user_name from issue inner join user on issue.support_officer = user.user_id group by support_officer");
+$resultt = mysqli_query($conn, "SELECT count(issue.issue_id) as numb, issue.facility, facility.name from issue inner join facility on issue.facility = facility.code group by facility order by numb asc");
+
+
+while ($numb = mysqli_fetch_array($resultt)) {
+  $f = $numb['name'];
+  $n = $numb['numb'];
+}
 
 $mon = [];
 $numberrrr = [];
@@ -61,7 +73,7 @@ while ($row = mysqli_fetch_array($result)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Facilities</title>
+    <title>Analytics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -144,17 +156,48 @@ while ($row = mysqli_fetch_array($result)) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8 mt-5">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body" style="float: left;">
-                                <canvas id="bar-chart3" width="600px" height="400px"></canvas>
+                                <canvas id="bar-chart3" width="1000px" height="400px"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 mt-5">
+                    <div class="col-lg-12 mt-5">
                         <div class="card">
                             <div class="card-body" style="float: right;">
-                                <?php echo $avg_resolve_time; ?>
+                              <!-- Hoverable Rows Table start -->
+                              <div class="col-lg-6 mt-5">
+                                  <div class="card">
+                                      <div class="card-body">
+                                          <h4 class="header-title">Quick Data</h4>
+                                          <div class="single-table">
+                                              <div class="table-responsive">
+                                                  <table class="table table-hover text-center">
+                                                      <thead class="text-uppercase">
+                                                          <tr>
+                                                              <th scope="col">Data</th>
+                                                              <th scope="col">Value</th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr>
+                                                              <th scope="row">Average Resolution Time</th>
+                                                              <td><?php echo $avg_resolve_time; ?></td>
+                                                          </tr>
+                                                          <tr>
+                                                              <th scope="row">Facility with Most Incidents</th>
+                                                              <td><?php echo ''.$f.' ('.$n.')'; ?></td>
+                                                          </tr>
+                                                      </tbody>
+                                                  </table>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <!-- Hoverable Rows Table end -->
+                                
                             </div>
                         </div>
                     </div>
@@ -190,7 +233,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($facility); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted per Facility",
+          label: "Total Incidents Submitted per Facility",
           backgroundColor: "#3e95cd",
           data:<?php echo json_encode($number); ?>
         }
@@ -212,7 +255,7 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Data For All Facilities'
+        text: 'Incident Log Data For All Facilities'
       }
     }
 });
@@ -224,7 +267,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($uname); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted per User",
+          label: "Total Incidents Submitted per User",
           backgroundColor: ["#3e95cd", "#7D998B", "#0bfd84", "#fdb60b", "#dd988c", "#dc8cdd", "#af8cdd", "#535469", "#d28e9c", "#d22411", "#adb6a9"],
           data:<?php echo json_encode($usern); ?>
         }
@@ -236,7 +279,7 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Submitted per User'
+        text: 'Incident Log Submitted per User'
       }
     }
 });
@@ -248,7 +291,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($mon); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted",
+          label: "Total Incidents Submitted per Month",
           backgroundColor: "#7DC8f8",
           data:<?php echo json_encode($numberrrr); ?>
         }
@@ -260,7 +303,7 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Data For All Facilities'
+        text: 'Incident Log Data For All Facilities Per Month'
       }
     }
 });

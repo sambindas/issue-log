@@ -4,6 +4,9 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+if ($_SESSION['logged_user'] == 'client') {
+    header('Location: clientindex.php');
+}
 
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
@@ -17,13 +20,15 @@ if (isset($_POST['form_submit'])) {
     $email2 = $_POST['email'];
     $phone = $_POST['phone'];
     $role = $_POST['role'];
+    $state = $_POST['state'];
 
-    $user = mysqli_query($conn, "UPDATE user set user_name = '$name', email = '$email2', phone = '$phone', user_role = '$role' where email = '$email'");
+    $user = mysqli_query($conn, "UPDATE user set state_id = '$state', user_name = '$name', email = '$email2', phone = '$phone', user_role = '$role' where email = '$email'");
 
     if ($user) {
         $_SESSION['msg'] = '<span class="alert alert-success">Profile Edited Successfully</span>';
         $_SESSION['name'] = $name;
         $_SESSION['email'] = $email2;
+        $_SESSION['state_id'] = $state;
     }
 }
 
@@ -95,6 +100,10 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                                                             $email3 = $user_row['email'];
                                                             $phone = $user_row['phone'];
                                                             $role = $user_row['user_role'];
+                                                            $state_id = $user_row['state_id'];
+
+                                                            $l = mysqli_query($conn, "SELECT * from state where id='$state_id'");
+                                                            while ($l_row = mysqli_fetch_array($l)) { $state_name = $l_row['state_name']; }
                                                         }
                                                         ?>
                                                         <div class="form-gp">
@@ -113,14 +122,27 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                                                             <div id="errpn"></div>
                                                         </div>
                                                         <div class="form-gp">
+                                                            <label for="exampleInputEmail1">State</label><br>
+                                                            <select class="custom-select border-0 pr-3" name="state" id="state" required>
+                                                                <option value=""> Select One</option>
+                                                                <?php
+                                                                    $sq = mysqli_query($conn, "SELECT * from state");
+                                                                    while ($qs = mysqli_fetch_array($sq)) {
+                                                                        echo '<option value="'.$qs['id'].'">'.$qs['state_name'].'</option>';
+                                                                    }
+                                                                ?>
+                                                                
+                                                            </select>
+                                                            <div id="errpn"></div>
+                                                        </div>
+                                                        <div class="form-gp">
                                                             <label for="exampleInputEmail1">Role</label><br>
-                                                            <select class="custome-select border-0 pr-3" name="role" id="user_role" required>
+                                                            <select class="custom-select border-0 pr-3" name="role" id="user_role" required>
                                                                 <option value=""> Select One</option>
                                                                 <option <?php if ($role == 'Developer') { echo 'selected'; } ?> value="Developer">Developer</option>
                                                                 <option <?php if ($role == 'Support Officer') { echo 'selected'; } ?> value="Support Officer">Support Officer</option>
                                                                 <option <?php if ($role == 'Others') { echo 'selected'; } ?> value="Support Officer">Others</option>
                                                             </select>
-                                                            <i class="ti-user"></i><br>
                                                             <div id="errpn"></div>
                                                         </div>
                                                         <div class="submit-btn-area">
@@ -145,7 +167,7 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved.</p>
+                <p>© Copyright 2019. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->
@@ -208,6 +230,48 @@ $user = mysqli_query($conn, "SELECT * from user where email = '$email'");
                     });
                 });
         
+    </script>
+    
+    <script type="text/javascript">
+        var timoutNow = 3600000; 
+        var logoutUrl = 'logout.php';
+        var timeoutTimer; 
+        // Start timers.
+        function StartTimers()
+        {
+            timeoutTimer = setTimeout("IdleTimeout()", timoutNow);
+        }
+        // Reset timers.
+        function ResetTimers() 
+        { 
+            console.log('reset');
+            clearTimeout(timeoutTimer);
+            StartTimers();
+            $('#idle_warning').hide();
+        }
+     
+        // Logout the user.
+        function IdleTimeout() 
+        {
+            window.location = logoutUrl;
+            $('#idle_warning').show(); 
+        }
+      $(document).ready(function()
+        {
+            StartTimers();
+            $(document).on('mousemove scroll keyup keypress mousedown mouseup mouseover',function(){
+            ResetTimers();
+            });
+        });
+     
+        $(window).on('load',function()
+        {
+            
+            $(window).on('mousemove scroll keyup keypress mousedown mouseup mouseover',function(){
+            ResetTimers();
+            });
+            
+        });
     </script>
 
 </html>

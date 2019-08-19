@@ -13,7 +13,24 @@ $noww = date('M Y');
 
 $issue_id = $_GET['issue_id'];
 
-$editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'");
+if (isset($issue_id)) {
+    if (isset($_POST['edit'])) {
+        $media_id = $_POST['media_id'];
+        $caption = $_POST['caption'];
+
+        mysqli_query($conn, "UPDATE media set caption = '$caption' where media_id = '$media_id'");
+        $_SESSION['msg'] = '<span class="alert alert-success">Media Caption Edited Successfully.</span>';
+    }
+    if (isset($_POST['delete'])) {
+        $media_id = $_POST['media_id'];
+
+        mysqli_query($conn, "DELETE from media where media_id = '$media_id'");
+        $_SESSION['msg'] = '<span class="alert alert-success">Media Deleted Successfully.</span>';
+    }
+} else {
+    $_SESSION['msg'] = '<span class="alert alert-danger">Must Select a valid Issue.</span>';
+    header("Location: index.php");
+}
 
 ?>
 
@@ -23,7 +40,7 @@ $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'")
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>eClinic Issues Log</title>
+    <title>Upload An Image</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -75,7 +92,63 @@ $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'")
                             <input type="hidden" name="url" value="<?php echo $url; ?>">
                             <input type='submit' class="btn btn-primary" name='submit_media' value='Upload'/>
                             <input type='submit' class="btn btn-success" name='submit_media2' value='Upload And Add New'/>
-                        </form>
+                        </form><br> <hr>
+                        <div>
+                            <?php 
+                            $i = mysqli_query($conn, "SELECT * from media where issue_id = '$issue_id'");
+                                
+                            while ($ir = mysqli_fetch_array($i)) {
+                                echo "<img src='media/".$ir['media_name']."' height='500' width='500' alt='".$ir['caption']."'>
+                                <button class='btn btn-danger' data-toggle='modal' data-target='#del".$ir['media_id']."'>Delete Media Entry</button>
+                                <button class='btn btn-primary' data-toggle='modal' data-target='#edit".$ir['media_id']."'>Edit Caption</button>
+                                <Br><hr><br>";
+                            
+                            
+                            ?>
+                            <!-- edit modal start -->
+                            <div class="modal fade" id="edit<?php echo $ir['media_id']; ?>">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit This Caption</h5>
+                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" action="">
+                                                <input type="text" name="caption" value="<?php echo $ir['caption']; ?>"><br>
+                                                <input type="hidden" name="media_id" value="<?php echo $ir['media_id']; ?>"><br>
+                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                <br><button type="submit" class="btn btn-primary" name="edit">Edit</button>
+                                            </form><br>
+                                        </div>
+                                        <div class="modal-footer">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- delete modal -->
+                            <div class="modal fade" id="del<?php echo $ir['media_id']; ?>">
+                                <div class="modal-dialog modal-sm">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Delete This Image</h5>
+                                            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form method="post" action="">
+                                                <input type="hidden" name="media_id" value="<?php echo $ir['media_id']; ?>"><br>
+                                                <input type="hidden" name="url" value="<?php echo $url; ?>"><br>
+                                                <br><button type="submit" class="btn btn-danger" name="delete">Delete</button>
+                                            </form><br>
+                                        </div>
+                                        <div class="modal-footer">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Small modal modal end -->
+                        <?php } ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,7 +157,7 @@ $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'")
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved.</p>
+                <p>© Copyright 2019. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->
@@ -110,23 +183,5 @@ $editq = mysqli_query($conn, "SELECT * from issue where issue_id = '$issue_id'")
     <script src="assets/js/scripts.js"></script>
     <script src="jquery.datetimepicker.full.min.js"></script>
     <script src="jquery.datetimepicker.js"></script>
-    <script type='text/javascript'>
-    $(document).ready(function(){
-        var counter = 2;
-        $('#del_file').hide();
-        $('img#add_file').click(function(){
-            $('#file_tools').before('<div class="file_upload" id="f'+counter+'"><input name="media[]" type="file">'+counter+' <br> <input type="text" id="del_inp" name="caption[]" placeholder="input caption"></div>');
-            $('#del_file').fadeIn(0);
-        counter++;
-        });
-        $('img#del_file').click(function(){
-            if(counter==3){
-                $('#del_file').hide();
-            }   
-            counter--;
-            $('#f'+counter).remove();
-        });
-    });
-    </script>
 
 </html>
