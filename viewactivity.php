@@ -89,13 +89,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -125,13 +125,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -161,13 +161,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -197,13 +197,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -233,13 +233,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -269,13 +269,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     
@@ -305,13 +305,13 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         $user = mysqli_fetch_array(mysqli_query($conn, "SELECT * from user where user_id = '$ud'"));
                         echo '  
                             <tr> 
-                                <td align="left">'.$user['user_name'].'</td>
-                                <td align="left">'.$run['facility'].'</td>
+                                <td align="center">'.$user['user_name'].'</td>
+                                <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
-                                <td align="left">'.$run['status'].'</td>
+                                <td align="center">'.$run['status'].'</td>
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
-                                <td align="left">'.$run['date_submitted'].'</td>
+                                <td align="center">'.$run['date_submitted'].'</td>
                             </tr>';
                     }
                     

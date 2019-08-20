@@ -78,6 +78,7 @@ $noww = date('M Y');
                                                         echo '<option value="'.$fc_row['code'].'">'.$fc_row['name'].'</option>';
                                                     }
                                                     ?>
+                                                    <option value="Others">Others</option>
                                                 </select>
                                             </div>
                                         </div>
