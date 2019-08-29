@@ -4,6 +4,9 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+if ($_SESSION['logged_user'] == 'client') {
+    header('Location: clientindex.php');
+}
 
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
@@ -32,7 +35,7 @@ while ($t = mysqli_fetch_array($editqq)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>eClinic Issues Log</title>
+    <title>Edit an Incident</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -108,7 +111,7 @@ while ($t = mysqli_fetch_array($editqq)) {
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-gp">
-                                                <h4  class="header-title mb-0">Issue Level</h4>
+                                                <h4  class="header-title mb-0">Incident Level</h4>
                                                 <select name="il" id="il" class="custome-select border-0 pr-3" required>
                                                     <option disabled selected="">Select One</option>
                                                     <option <?php if($selected2 == "1") echo "SELECTED";?> value="1">Level One (1 hr - 24 hrs)</option>
@@ -119,7 +122,7 @@ while ($t = mysqli_fetch_array($editqq)) {
                                             </div>
                                         </div>
                                     </div>
-                                    <h4 class="header-title mb-0">Issue</h4>
+                                    <h4 class="header-title mb-0">Incident</h4>
                                     <textarea required cols="73" rows="6" type="text" id="issue" name="issue" placeholder="issue"><?php echo $li_row['issue'] ?></textarea>
                                     <script>
                                         CKEDITOR.replace( 'issue' );
@@ -127,7 +130,7 @@ while ($t = mysqli_fetch_array($editqq)) {
                                     <div class="row"> 
                                         <div class="col-sm-3">           
                                             <div class="form-gp">
-                                                <h4 class="header-title mb-0">Issue Client Reporter</h4>
+                                                <h4 class="header-title mb-0">Incident Client Reporter</h4>
                                                 <input type="text" name="icr" id="icr" value="<?php echo $li_row['issue_client_reporter'] ?>" required>
                                             </div>
                                         </div>
@@ -158,7 +161,7 @@ while ($t = mysqli_fetch_array($editqq)) {
                                         </div>
                                     </div>
                                 </div>
-                                <input type="Submit" name="edit_issue" value="Submit Issue" style="float: right;" class="btn btn-primary">
+                                <input type="Submit" name="edit_issue" value="Submit Incident" style="float: right;" class="btn btn-primary">
                             </form>
                         </div>
                     </div>
@@ -172,7 +175,7 @@ while ($t = mysqli_fetch_array($editqq)) {
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved.</p>
+                <p>© Copyright 2019. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->

@@ -1,9 +1,15 @@
 <?php
 session_start();
 
-if (isset($_SESSION['email'])) {
-header("Location: index.php");
+if (isset($_SESSION['logged_user'])) {
+    $l_u = $_SESSION['logged_user'];
+    if ($l_u == 'client') {
+        header("Location: clientindex.php");
+    } elseif ($l_u == 'support') {
+        header("Location: index.php");
+    }  
     }
+
 ?>
 <!doctype html>
 <html class="no-js" lang="en">
@@ -44,7 +50,13 @@ header("Location: index.php");
                 <form action="javascript:;">
                     <div class="login-form-head">
                         <img src="logo.jpeg"><br><br>
-                        <p>Sign in to use the Issue log</p><br>
+                        <p>Sign in to use the Incident log</p><br>
+                        <p><?php 
+                        if (isset($_SESSION['msg'])) {
+                            echo $_SESSION['msg'];
+                            unset($_SESSION['msg']);
+                        }
+                        ?></p>
                         <p id="formErr"></p>
                     </div>
                     <div class="login-form-body">
@@ -63,12 +75,10 @@ header("Location: index.php");
                                 <a href="reset-pass.php">Forgot Password?</a>
                             </div>
                         </div>
+                        <input type="hidden" id="user_type" name="user_type" value="eclat">
                         <div class="submit-btn-area">
                             <input value="Submit" id="form_submit" class="btn btn-primary" type="submit">
                             <div id="loade"></div>
-                        </div>
-                        <div class="form-footer text-center mt-5">
-                            <p class="text-muted">Don't have an account? <a href="register.php">Sign up</a></p>
                         </div>
                     </div>
                 </form>
@@ -99,6 +109,7 @@ header("Location: index.php");
                 $('#loade').html('<img src="assets/images/eclipse.gif">');
                 var email = $('#email').val();
                 var password = $('#password').val();
+                var user_type = $('#user_type').val();
 
                 if (email == '' || password == '') {
                     $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
@@ -110,15 +121,17 @@ header("Location: index.php");
                     $('#formErr').html('');
 
 
-                    var datastring = 'email='+email+'&password='+password;
+                    var datastring = 'email='+email+'&password='+password+'&user_type='+user_type;
 
                     $.ajax({
                         url: 'ajax/login.php',
                         method: 'post',
                         data: datastring,
                         success: function(msg){
-                            if (msg == 1) {
+                            if (msg == 'support') {
                                 window.location.replace('index.php');
+                            } else if (msg == 'client') {
+                                window.location.replace('clientindex.php');
                             } else {
                                 $('#formErr').html('<span class="alert alert-danger">Authentication Failed!</span>');
                                 $('#form_submit').fadeIn();

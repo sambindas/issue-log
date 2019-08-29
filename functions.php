@@ -1,7 +1,11 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exceptoin;
 $conn = mysqli_connect("localhost", "root", "", "laundry");
+error_reporting(0);
+
 function checkUserSession() {
-    if (!isset($_SESSION['email']) && !isset($_SESSION['name']) && !isset($_SESSION['id'])) {
+    if (!isset($_SESSION['logged_user'])) {
         header("Location: login.php");
     } else {
         $email = $_SESSION['email'];
@@ -9,9 +13,97 @@ function checkUserSession() {
     }
 }
 
-function userInfo($email) {
-    $userInfoQ = mysqli_query($conn, "SELECT * from users where email = $email");
-    }
+$uid = $_SESSION['id'];
+$s = mysqli_query($conn, "SELECT * from user where user_id='$uid'");
+while ($ss = mysqli_fetch_array($s)) {
+   $user_state_id = $ss['state_id'];
+   $l = mysqli_query($conn, "SELECT * from state where id='$user_state_id'");
+    while ($l_row = mysqli_fetch_array($l)) { $state_name = $l_row['state_name']; }
+}
+
+$hid = $_SESSION['id'];
+$timee = time();
+
+$tim = $timee+300;
+
+$update = mysqli_query($conn, "UPDATE user set online_status = '$tim' where user_id = '$hid'");
+
+function sendMail($email, $rrr, $subject, $message, $msg, $url) {
+  // Load Composer's autoloader
+      require 'vendor/autoload.php';
+
+      // Instantiation and passing `true` enables exceptions
+      $mail = new PHPMailer(true);
+
+      try {
+          //Server settings
+          $mail->SMTPDebug = 2;                                       // Enable verbose debug output
+          $mail->isSMTP();                                            // Set mailer to use SMTP
+          $mail->Host       = 'smtp.gmail.com;';  // Specify main and backup SMTP servers
+          $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+          $mail->Username   = 'incidentlog00@gmail.com';              // SMTP username
+          $mail->Password   = 'wallace@femi';                         // SMTP password
+          $mail->SMTPSecure = 'tls';                                  // Enable TLS encryption, `ssl` also accepted
+          $mail->Port       = 587;                                    // TCP port to connect to
+
+          //Recipients
+          $mail->setFrom('incidentlog00@gmail.com', 'Incident Log');
+          $mail->addAddress($email, $rrr);     // Add a recipient
+          $mail->addReplyTo('incidentlog00@gmail.com', 'Incident Log');
+
+          // Content
+          $mail->isHTML(true);                                  // Set email format to HTML
+          $mail->Subject = $subject;
+          $mail->Body    = $message;
+          
+
+          $mail->send();
+          $_SESSION['msg'] = $msg;
+          return 1;
+          exit();
+      } catch (Exception $e) {
+          echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+      }
+}
+
+function sendMail2($email, $rrr, $subject, $message, $msg, $url, $email2) {
+  // Load Composer's autoloader
+      require 'vendor/autoload.php';
+
+      // Instantiation and passing `true` enables exceptions
+      $mail = new PHPMailer(true);
+
+      try {
+          //Server settings
+          $mail->SMTPDebug = 2;                                       // Enable verbose debug output
+          $mail->isSMTP();                                            // Set mailer to use SMTP
+          $mail->Host       = 'smtp.gmail.com;';  // Specify main and backup SMTP servers
+          $mail->SMTPAuth   = true;                                   // Enable SMTP authentication
+          $mail->Username   = 'incidentlog00@gmail.com';              // SMTP username
+          $mail->Password   = 'wallace@femi';                         // SMTP password
+          $mail->SMTPSecure = 'tls';                                  // Enable TLS encryption, `ssl` also accepted
+          $mail->Port       = 587;                                    // TCP port to connect to
+
+          //Recipients
+          $mail->setFrom('incidentlog00@gmail.com', 'Incident Log');
+          $mail->addAddress($email);     // Add a recipient
+          $mail->addAddress($email2);
+          $mail->addReplyTo('incidentlog00@gmail.com', 'Incident Log');
+
+          // Content
+          $mail->isHTML(true);                                  // Set email format to HTML
+          $mail->Subject = $subject;
+          $mail->Body    = $message;
+          
+
+          $mail->send();
+          $_SESSION['msg'] = $msg;
+          return 1;
+          exit();
+      } catch (Exception $e) {
+          echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+      }
+}
 
 function secondsToTime($inputSeconds) {
     $secondsInAMinute = 60;
@@ -102,7 +194,7 @@ function make_slides($conn, $issue_id)
    $output .= '<div class="item">';
   }
   $output .= '
-   <a href="javascript:;"><img class="fancybox" src="media/'.$row["media_name"].'" title="'.$row["caption"].'" /></a>
+   <a href="media/'.$row["media_name"].'" class="gallery"><img class="fancybox" src="media/'.$row["media_name"].'"  alt="'.$row["caption"].'"/></a>
    <div class="carousel-caption">
    </div>
   </div>
@@ -111,7 +203,7 @@ function make_slides($conn, $issue_id)
  }
   return $output;
 } else {
-    $output = '<p>No Media For This Issue!</p>';
+    $output = '<p>No Media For This Incident!</p>';
  return $output;
 }
 }

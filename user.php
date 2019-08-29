@@ -4,6 +4,9 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+if ($_SESSION['logged_user'] == 'client') {
+    header('Location: clientindex.php');
+}
 
 $protocol = ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') || $_SERVER['SERVER_PORT'] == 443) ? "https://" : "http://";
 
@@ -102,6 +105,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                     <th>S/N</th>
                                                     <th>Name</th>
                                                     <th>Role</th>
+                                                    <th>State</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
                                                     <th>Actions</th>
@@ -113,12 +117,15 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                 $il = mysqli_query($conn, "SELECT * from user");
                                                 $sn = 1;
                                                 while ($li_row = mysqli_fetch_array($il)) {
-                              
+                                                $state_id = $li_row['state_id'];
+                                                $l = mysqli_query($conn, "SELECT * from state where id='$state_id'");
+                                                while ($l_row = mysqli_fetch_array($l)) { $state_name = $l_row['state_name']; }
                                                 ?>
                                                 <tr>
                                                     <td><?php echo $sn++; ?></td>
                                                     <td><?php echo $li_row['user_name'] ; ?></td>
                                                     <td><?php echo $li_row['user_role'] ; ?></td>
+                                                    <td><?php echo $state_name; ?></td>
                                                     <td><?php echo $li_row['email'] ; ?></td>
                                                     <td><?php echo $li_row['phone'] ; ?></td>
                                                     <td><div class="dropdown">
@@ -225,6 +232,17 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                                                             <i class="ti-email"></i><br>
                                                             <div id="errem"></div>
                                                         </div>
+                                                        <div class="form-gp">                                                            
+                                                            <select name="state" id="state" class="custom-select border-0 pr-3" required>
+                                                                <option value="" selected="">Select State</option>
+                                                                <?php
+                                                                $fc = mysqli_query($conn, "SELECT * from state");
+                                                                while ($fc_row = mysqli_fetch_array($fc)) {
+                                                                    echo '<option value="'.$fc_row['id'].'">'.$fc_row['state_name'].'</option>';
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
                                                         <div class="form-gp">
                                                             <label for="exampleInputEmail1">Phone Number</label>
                                                             <input type="text" id="phone" required>
@@ -273,7 +291,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         <!-- footer area start-->
         <footer>
             <div class="footer-area">
-                <p>© Copyright 2018. All right reserved.</p>
+                <p>© Copyright 2019. All right reserved.</p>
             </div>
         </footer>
         <!-- footer area end-->
@@ -303,7 +321,6 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
             $(document).ready(function(){
                 
                 $('#form_submit').click(function(){
-                    console.log(876);
 
                     var name = $('#fullname').val();
                     var email = $('#email').val();
@@ -311,12 +328,13 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     var password = $('#password').val();
                     var password2 = $('#password2').val();
                     var role = $('#user_role').val();
+                    var state = $('#state').val();
 
-                    if (name == '' || email == '' || phone == '' || password == '' || password2 == '') {
+                    if (name == '' || email == '' || phone == '' || password == '' || password2 == '' || state == '') {
                         $('#formErr').html('<span class="alert alert-danger">Please Fill In All Fields</span>');
                         return false;
                     }
-                    else if (name != '' || email != '' || phone != '' || password != '' || password2 != '') {
+                    else if (name != '' || email != '' || phone != '' || password != '' || password2 != '' || state != '') {
                         $('#formErr').html('');
 
                         var datastring = 'email='+email;
@@ -348,7 +366,7 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                         });
 
 
-                        var datastring = 'name='+name+'&email='+email+'&phone='+phone+'&password='+password+'&role='+role;
+                        var datastring = 'name='+name+'&email='+email+'&phone='+phone+'&password='+password+'&role='+role+'&state='+state;
 
                         function registerFinal() {
 
@@ -369,6 +387,10 @@ $url = $protocol . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
                     });
                 });
         
+    </script>
+    
+    <script type="text/javascript">
+        var dataTable = $('#dataTable2').DataTable({});
     </script>
 
 </html>

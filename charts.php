@@ -3,11 +3,26 @@ session_start();
 require 'connection.php';
 require 'functions.php';
 checkUserSession();
+if ($_SESSION['logged_user'] == 'client') {
+    header('Location: clientindex.php');
+}
+//if someone filters
+if (isset($_GET['from']) and isset($_GET['to'])) {
+    $from = $_GET['from'];
+    $to = $_GET['to'];
+}
+
+//time average
 
 $sum_issue = 0;
 $sum_res = 0;
 
-$time_average = mysqli_query($conn, "SELECT issue_date, resolution_date from issue where status = '3'");
+$time_averag = "SELECT issue_date, resolution_date from issue where status = '3'";
+if ($from != '' and $to != '') {
+    $time_averag .= "and fissue_date between '$from' and '$to'";
+}
+$time_average = mysqli_query($conn, $time_averag);
+
 while ($time_avg = mysqli_fetch_array($time_average)) {
   $issue_d = $time_avg['issue_date'];
   $res  = $time_avg['resolution_date'];
@@ -22,11 +37,47 @@ while ($time_avg = mysqli_fetch_array($time_average)) {
 $final = $sum_res  - $sum_issue;
 $fnumber =  mysqli_num_rows($time_average);
 $fd = $final / $fnumber;
+//this function calculates the average time
 $avg_resolve_time = secondsToTime($fd);
 
-$result = mysqli_query($conn, "SELECT count(issue_id) as numberr, facility from issue group by facility");
-$line = mysqli_query($conn, "SELECT count(issue_id) as numberrrr, month from issue group by month");
-$userq = mysqli_query($conn, "SELECT count(issue.issue_id) as numberrr, issue.support_officer, user.user_name from issue inner join user on issue.support_officer = user.user_id group by support_officer");
+$resul = "SELECT count(issue_id) as numberr, facility from issue";
+if ($from != '' and $to != '') {
+    $resul .= " where fissue_date between '$from' and '$to' group by facility";
+} else {
+  $resul .= " group by facility";
+}
+$result = mysqli_query($conn, $resul);
+
+$lin = "SELECT count(issue_id) as numberrrr, month, issue_id from issue";
+if ($from != '' and $to != '') {
+    $lin .= " where fissue_date between '$from' and '$to' group by month order by issue_id asc";
+} else {
+  $lin .= " group by month order by issue_id asc";
+}
+
+$line = mysqli_query($conn, $lin);
+
+$userqq = "SELECT count(issue.issue_id) as numberrr, issue.support_officer, user.user_name from issue inner join user on issue.support_officer = user.user_id";
+if ($from != '' and $to != '') {
+    $userqq .= " where fissue_date between '$from' and '$to' group by support_officer";
+} else {
+  $userqq .= " group by support_officer";
+}
+
+$userq = mysqli_query($conn, $userqq);
+
+$resulttt = "SELECT count(issue.issue_id) as numb, issue.facility, facility.name from issue inner join facility on issue.facility = facility.code";
+if ($from != '' and $to != '') {
+    $resulttt .= " where fissue_date between '$from' and '$to' group by facility order by numb asc";
+} else {
+  $resulttt .= " group by facility order by numb asc";
+}
+$resultt = mysqli_query($conn, $resulttt);
+
+while ($numb = mysqli_fetch_array($resultt)) {
+  $f = $numb['name'];
+  $n = $numb['numb'];
+}
 
 $mon = [];
 $numberrrr = [];
@@ -61,7 +112,7 @@ while ($row = mysqli_fetch_array($result)) {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Facilities</title>
+    <title>Analytics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" type="image/png" href="assets/images/icon/favicon.ico">
     <link rel="stylesheet" href="assets/css/bootstrap.min.css">
@@ -127,6 +178,47 @@ while ($row = mysqli_fetch_array($result)) {
                     </div>
                 </div>
             </div>
+
+            <div class="container">
+              <form action="" method="get" id="filterid">
+
+              <div class="form-group row">
+                  <div class="col-sm-2">
+                      <label for="ex1">Show Data From</label>
+                      <?php
+                      if ($from != '') {
+                          echo '<input type="text" name="from" class="form-control" id="datetimepicker1" value="'.$from.'" readonly placeholder="From" name="from"><i class="ti-calender"></i>';
+                      } else {
+                          echo '<input type="text" name="from" class="form-control" id="datetimepicker1" value="'.date('Y-m-01').'" readonly placeholder="From" name="from"><i class="ti-calender"></i>';
+                      }
+                      ?>
+                  </div>
+                  <div class="col-sm-2">
+                      <label for="ex1">To</label>
+                      <?php
+                      if ($to != '') {
+                          echo '<input type="text" class="form-control" id="datetimepicker2" value="'.$to.'" readonly placeholder="To" name="to"><i class="ti-calender"></i>';
+                      } else {
+                          echo '<input type="text" class="form-control" id="datetimepicker2" value="'.date('Y-m-d').'" readonly placeholder="To" name="to"><i class="ti-calender"></i>';
+                      }
+                      ?>
+                  </div> &nbsp;
+                  <div class="col-sm-2">
+                  <label>&nbsp;&nbsp;</label><br>
+                      <input type="submit" id="filter" class="btn-flat btn btn-primary btn-xs" value="Filter">
+                      <a type="button" href="charts.php" class="btn-flat btn btn-primary btn-xs">Clear Filter</a>
+                  </div>
+              </div>
+              <hr>
+            </form><br>
+            <?php
+              if ($to != '') {
+                  echo 'SHOWING DATA FOR: <b>'.$from.' <b/>to <b>'.$to.'</b>';
+              } else {
+                  echo 'SHOWING ALL DATA';
+              }
+              ?>
+            </div>
             <div class="main-content-inner">
                 <!-- bar chart start -->
                 <div class="row">
@@ -144,17 +236,43 @@ while ($row = mysqli_fetch_array($result)) {
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-8 mt-5">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body" style="float: left;">
-                                <canvas id="bar-chart3" width="600px" height="400px"></canvas>
+                                <canvas id="bar-chart3" width="1000px" height="400px"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 mt-5">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body" style="float: right;">
-                                <?php echo $avg_resolve_time; ?>
+                              <!-- Hoverable Rows Table start -->
+                              <div class="col-lg-6 mt-5">
+                                <h4 class="header-title">Quick Data</h4>
+                                <div class="single-table">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover text-center">
+                                            <thead class="text-uppercase">
+                                                <tr>
+                                                    <th scope="col">Data</th>
+                                                    <th scope="col">Value</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row">Average Resolution Time</th>
+                                                    <td><?php echo $avg_resolve_time; ?></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">Facility with Most Incidents</th>
+                                                    <td><?php echo ''.$f.' ('.$n.')'; ?></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                              </div>
+                              <!-- Hoverable Rows Table end -->
                             </div>
                         </div>
                     </div>
@@ -175,6 +293,7 @@ while ($row = mysqli_fetch_array($result)) {
     <script src="assets/js/scripts.js"></script>
     <!-- jquery latest version -->
     <script src="assets/js/vendor/jquery-2.2.4.min.js"></script>
+    
     <!-- bootstrap 4 js -->
     <script src="assets/js/popper.min.js"></script>
     <script src="assets/js/bootstrap.min.js"></script>
@@ -190,7 +309,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($facility); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted per Facility",
+          label: "Total Incidents Submitted per Facility",
           backgroundColor: "#3e95cd",
           data:<?php echo json_encode($number); ?>
         }
@@ -212,7 +331,7 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Data For All Facilities'
+        text: 'Incident Log Data For All Facilities'
       }
     }
 });
@@ -224,7 +343,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($uname); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted per User",
+          label: "Total Incidents Submitted per User",
           backgroundColor: ["#3e95cd", "#7D998B", "#0bfd84", "#fdb60b", "#dd988c", "#dc8cdd", "#af8cdd", "#535469", "#d28e9c", "#d22411", "#adb6a9"],
           data:<?php echo json_encode($usern); ?>
         }
@@ -236,7 +355,7 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Submitted per User'
+        text: 'Incident Log Submitted per User'
       }
     }
 });
@@ -248,7 +367,7 @@ while ($row = mysqli_fetch_array($result)) {
       labels: <?php echo json_encode($mon); ?>,
       datasets: [
         {
-          label: "Total Issues Submitted",
+          label: "Total Incidents Submitted per Month",
           backgroundColor: "#7DC8f8",
           data:<?php echo json_encode($numberrrr); ?>
         }
@@ -260,11 +379,41 @@ while ($row = mysqli_fetch_array($result)) {
       legend: { display: true },
       title: {
         display: true,
-        text: 'Issues Log Data For All Facilities'
+        text: 'Incident Log Data For All Facilities Per Month'
       }
     }
 });
   </script>
+  <script src="jquery.datetimepicker.full.min.js"></script>
+    <script src="jquery.datetimepicker.js"></script>
+    <script type="text/javascript">
+       $(document).ready(function(){
+            jQuery('#datetimepicker2').datetimepicker({
+                format: 'Y-m-d',
+                timepicker:false,
+                maxDate: '0d',
+            });
+
+            jQuery('#datetimepicker1').datetimepicker({
+             i18n:{
+              de:{
+               months:[
+                'January','February','March','April',
+                'May','June','July','August',
+                'September','October','November','December',
+               ],
+               dayOfWeek:[
+                "Su.", "Mo", "Tu", "We", 
+                "Th", "Fr", "Sa.",
+               ]
+              }
+             },
+             format:'Y-m-d',
+             timepicker:false,
+             maxDate: '0d',
+            });
+        });
+    </script>
 </body>
 
 </html>

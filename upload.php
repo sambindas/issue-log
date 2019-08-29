@@ -24,12 +24,11 @@ if(isset($_POST["submit_file"]))
   $irt = $csv[14];
   $im = $csv[15];
 
-  $insert = "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, fissue_date, issue_reported_on, issue_client_reporter, affected_dept, support_officer, priority, status, month, resolved_by, resolution_date, info_relayed_to, info_medium)
-         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$fdate', '$irod', '$icr', '$ad', '$so', '$priority', '$status', '$month', '$irb', '$rd', '$irt', '$im')";
+  $insert = mysqli_query($conn, "INSERT INTO issue (facility, issue_type, issue_level, issue, issue_date, fissue_date, issue_reported_on, issue_client_reporter, affected_dept, support_officer, priority, status, month, resolved_by, resolution_date, info_relayed_to, info_medium)
+         VALUES ('$facility', '$type', '$il', '$issue', '$date', '$fdate', '$irod', '$icr', '$ad', '$so', '$priority', '$status', '$month', '$irb', '$rd', '$irt', '$im')");
   	
  }
- print_r($insert);
- die();
+
  if ($insert) {
        $_SESSION['msg'] = '<span class="alert alert-success">Issues Imported Successfully.</span>';
         header("Location: index.php");

@@ -21,14 +21,17 @@
                                 <a href="javascript:void(0)" aria-expanded="true"><i class="ti-dashboard"></i><span>Home</span></a>
                                 <ul class="collapse">
                                     <li class="active"><a href="index.php">Incident Log</a></li>
-                                    <li class="active"><a href="charts.php">Analytics</a></li>
+                                    <li><a href="charts.php">Analytics</a></li>
+                                    <li><a href="activity.php">Activity Log</a></li>
                                 </ul>
                             </li>
                             <li>
                                 <a href="javascript:void(0)" aria-expanded="true"><i class="ti-pie-chart"></i><span>Manage</span></a>
                                 <ul class="collapse">
                                     <li><a href="facility.php">Facilities</a></li>
+                                    <li><a href="state.php">States</a></li>
                                     <li><a href="user.php">Users</a></li>
+                                    <li><a href="portal.php">Client Credentials</a></li>
                                 </ul>
                             </li>
                         </ul>

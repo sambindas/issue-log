@@ -19,7 +19,7 @@ if(!empty($_POST["type"])){
 }elseif(!empty($_POST["level"])){
     //Fetch all city data
     $level = $_POST['level'];
-    $query = mysqli_query($conn, "SELECT * FROM user WHERE user_role = '$level'");
+    $query = mysqli_query($conn, "SELECT * FROM user WHERE status = 1 and user_role = '$level'");
     
     //Count total number of rows
     $rowCount = $query->num_rows;
@@ -32,6 +32,23 @@ if(!empty($_POST["type"])){
         }
     }else{
         echo '<option value="">Not available</option>';
+    }
+}elseif(!empty($_POST["state"])){
+    //Fetch all city data
+    $state = $_POST['state'];
+    $query = mysqli_query($conn, "SELECT * FROM facility WHERE state_id = '$state'");
+    
+    //Count total number of rows
+    $rowCount = $query->num_rows;
+    
+    //City option list
+    if(mysqli_num_rows($query) > 0){
+        echo '<option value="">Select Facility</option>';
+        while($row = mysqli_fetch_array($query)){ 
+            echo '<option value="'.$row['code'].'">'.$row['name'].'</option>';
+        }
+    }else{
+        echo '<option value="">No Facility in this State</option>';
     }
 }
 ?>
