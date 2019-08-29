@@ -18,10 +18,16 @@ $end_week = date("Y/m/d",$end_week);
 $user_table_email = array();
 $activity_table_email = array();
 
+<<<<<<< HEAD
 $users = mysqli_query($conn, "SELECT user_name, email from user where user_type = 0 and status = 1 and user_role = 'Support Officer'");
 while ($user = mysqli_fetch_array($users)) {
 	$user_table_email[] = $user['user_name'];
   $user_email[] = $user['email'];
+=======
+$users = mysqli_query($conn, "SELECT user_name from user where user_type = 0 and status = 1 and user_role = 'Support Officer'");
+while ($user = mysqli_fetch_array($users)) {
+	$user_table_email[] = $user['user_name'];
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 }
 // print_r($user_table_email);
 
@@ -42,12 +48,15 @@ while ($a_user = mysqli_fetch_array($a_users)) {
 $diff = array_diff($user_table_email, $activity_table_email);
 // print_r($diff);
 // die();
+<<<<<<< HEAD
 foreach ($diff as $email_key) {
   $users_email = mysqli_query($conn, "SELECT email from user where user_name = '$email_key'");
     while ($user_email = mysqli_fetch_array($users_email)) {
     $users_table_email[] = $user_email['email'];
   }
 }
+=======
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 if (empty($diff)) {
 	$mess = 'There were no Incomplete Logs this week';
@@ -77,11 +86,16 @@ if (empty($diff)) {
           $mail->setFrom('incidentlog00@gmail.com', 'Incident Log');
           $mail->addReplyTo('incidentlog00@gmail.com', 'Incident Log');
           while (list ($key, $val) = each ($send_email)) {
+<<<<<<< HEAD
     			$mail->AddAddress($val);
     			}
           while (list ($key, $va) = each ($users_table_email)) {
           $mail->addCC($va);
           }
+=======
+			$mail->AddAddress($val);
+			}
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
           // Content
           $mail->isHTML(true);                                  // Set email format to HTML

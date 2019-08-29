@@ -29,6 +29,12 @@ if (isset($_POST['submit_activity'])) {
     $month = date('F', strtotime($activity_date));
     $year = date('Y', strtotime($activity_date));
     $user_id = $_SESSION['id'];
+<<<<<<< HEAD
+=======
+    print_r(date('Y/m/d'));
+    print_r($activity_date);
+    die();
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
         $insert = mysqli_query($conn, "INSERT INTO activity (facility, activity, user_id, status, pstatus, activity_date, week, month, year, date_submitted, day, visit_type, comments)
          VALUES ('$facility', '$activity', '$user_id', '$status', '$pstatus', '$activity_date', '$week', '$month', '$year', '$date', '$day', '$visit_type', '$comments')");

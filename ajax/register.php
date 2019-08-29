@@ -12,8 +12,15 @@ require '../connection.php';
 	$role = mysqli_real_escape_string($conn, $_POST['role']);
 	$state = $_POST['state'];
 
+<<<<<<< HEAD
 	$query = mysqli_query($conn, "INSERT into user (user_name, email, phone, password, date_added, user_role, status, state_id, user_type) 
 								values ('$name', '$email', '$phone', '$password', now(), '$role', 1, '$state', 0)");
+=======
+	$query = "INSERT into user (user_name, email, phone, password, date_added, user_role, status, state_id, user_type) 
+								values ('$name', '$email', '$phone', '$password', now(), '$role', 1, '$state', 0)";
+								print_r($query);
+								die();
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 	if ($query) {
 		$_SESSION['msg'] = '<span class="alert alert-success">User Registered Successfully</span>';

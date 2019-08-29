@@ -6,11 +6,14 @@ checkUserSession();
 if ($_SESSION['logged_user'] == 'client') {
     header('Location: clientindex.php');
 }
+<<<<<<< HEAD
 //if someone filters
 if (isset($_GET['from']) and isset($_GET['to'])) {
     $from = $_GET['from'];
     $to = $_GET['to'];
 }
+=======
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 //time average
 
@@ -40,6 +43,7 @@ $fd = $final / $fnumber;
 //this function calculates the average time
 $avg_resolve_time = secondsToTime($fd);
 
+<<<<<<< HEAD
 $resul = "SELECT count(issue_id) as numberr, facility from issue";
 if ($from != '' and $to != '') {
     $resul .= " where fissue_date between '$from' and '$to' group by facility";
@@ -73,6 +77,13 @@ if ($from != '' and $to != '') {
   $resulttt .= " group by facility order by numb asc";
 }
 $resultt = mysqli_query($conn, $resulttt);
+=======
+$result = mysqli_query($conn, "SELECT count(issue_id) as numberr, facility from issue group by facility");
+$line = mysqli_query($conn, "SELECT count(issue_id) as numberrrr, month, issue_id from issue group by month order by issue_id asc");
+$userq = mysqli_query($conn, "SELECT count(issue.issue_id) as numberrr, issue.support_officer, user.user_name from issue inner join user on issue.support_officer = user.user_id group by support_officer");
+$resultt = mysqli_query($conn, "SELECT count(issue.issue_id) as numb, issue.facility, facility.name from issue inner join facility on issue.facility = facility.code group by facility order by numb asc");
+
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 while ($numb = mysqli_fetch_array($resultt)) {
   $f = $numb['name'];
@@ -243,11 +254,16 @@ while ($row = mysqli_fetch_array($result)) {
                             </div>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <div class="col-lg-12">
+=======
+                    <div class="col-lg-12 mt-5">
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <div class="card">
                             <div class="card-body" style="float: right;">
                               <!-- Hoverable Rows Table start -->
                               <div class="col-lg-6 mt-5">
+<<<<<<< HEAD
                                 <h4 class="header-title">Quick Data</h4>
                                 <div class="single-table">
                                     <div class="table-responsive">
@@ -273,6 +289,38 @@ while ($row = mysqli_fetch_array($result)) {
                                 </div>
                               </div>
                               <!-- Hoverable Rows Table end -->
+=======
+                                  <div class="card">
+                                      <div class="card-body">
+                                          <h4 class="header-title">Quick Data</h4>
+                                          <div class="single-table">
+                                              <div class="table-responsive">
+                                                  <table class="table table-hover text-center">
+                                                      <thead class="text-uppercase">
+                                                          <tr>
+                                                              <th scope="col">Data</th>
+                                                              <th scope="col">Value</th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr>
+                                                              <th scope="row">Average Resolution Time</th>
+                                                              <td><?php echo $avg_resolve_time; ?></td>
+                                                          </tr>
+                                                          <tr>
+                                                              <th scope="row">Facility with Most Incidents</th>
+                                                              <td><?php echo ''.$f.' ('.$n.')'; ?></td>
+                                                          </tr>
+                                                      </tbody>
+                                                  </table>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <!-- Hoverable Rows Table end -->
+                                
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                             </div>
                         </div>
                     </div>

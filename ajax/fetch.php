@@ -13,7 +13,13 @@ $state_id = $_SESSION['state_id'];
 $column = array('issue_id', 'facility', 'issue_type', 'incident', 'priority', 'support_officer', 'issue_date');
 
 $noww = date('M Y');
+<<<<<<< HEAD
 $query = "SELECT * FROM issue where state_id = '$state_id'";
+=======
+$query = "
+SELECT * FROM issue where state_id = '$state_id'
+";
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 if ($_POST['datetimepicker1'] != '' || $_POST['datetimepicker2'] != '') {
 	$query .= 'and fissue_date between "'.$_POST['datetimepicker1'].'" and "'.$_POST['datetimepicker2'].'"';

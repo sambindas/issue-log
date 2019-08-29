@@ -227,6 +227,7 @@ $incident_logger = mysqli_query($conn, "SELECT * from user where status = 1 and 
                                         <input type="submit" name="filter" id="filter" class="btn-flat btn btn-primary btn-xs" value="Filter">
                                     </div>
                                 </div>
+<<<<<<< HEAD
 
 
                                 <!-- <div class="form-group" style="margin-bottom:20px">
@@ -239,6 +240,8 @@ $incident_logger = mysqli_query($conn, "SELECT * from user where status = 1 and 
                                         </div>
                                     </div>
                                 </div>  -->
+=======
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <hr>
                                 
                                 </form><br>

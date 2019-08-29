@@ -67,6 +67,7 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
             <div class="container"><br>
                 <a href="newactivity.php" id="newissue" class="btn btn-primary btn-flat">New Activity</a><br><br>
                 <h1>Activity For Week <?php echo "$week of $month $year"; ?></h1><br><br>
+<<<<<<< HEAD
 
                 <!-- <div class="form-group" style="margin-bottom:20px">
                     <div class="col-sm-12">
@@ -81,6 +82,8 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                     </div>
                 </div> -->
 
+=======
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                 <h3>Monday</h3><br>
                 <table class="table text-center" border="1" style="padding: 10px; width: 100%">
                 <?php 
@@ -92,7 +95,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -106,7 +113,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -128,7 +139,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -142,7 +157,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -164,7 +183,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -178,7 +201,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -200,7 +227,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -214,7 +245,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -236,7 +271,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -250,7 +289,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -272,7 +315,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -286,7 +333,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
@@ -308,7 +359,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                         <th> Officer </th>
                         <th> Facilty Name </th>
                         <th> Activity Description </th>
+<<<<<<< HEAD
                         <th> Status / Visit Type </th>
+=======
+                        <th> Status </th>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                         <th> Status Comments </th>
                         <th> Previous Status </th>
                         <th> Date Logged </th>
@@ -322,7 +377,11 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                                 <td align="center">'.$user['user_name'].'</td>
                                 <td align="center">'.$run['facility'].'</td>
                                 <td align="left">'.$run['activity'].'</td>
+<<<<<<< HEAD
                                 <td align="center">'.$run['status'].' <br> <hr> '.$run['visit_type'].'</td>
+=======
+                                <td align="center">'.$run['status'].'</td>
+>>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                                 <td align="left">'.$run['comments'].'</td>
                                 <td align="left">'.$run['pstatus'].'</td>
                                 <td align="center">'.$run['date_submitted'].'</td>
