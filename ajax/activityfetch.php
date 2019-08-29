@@ -55,14 +55,11 @@ if(isset($_POST['order']))
 {
  $query .= 'GROUP BY user_id ORDER BY '.$column[$_POST['order']['0']['column']].' '.$_POST['order']['0']['dir'].' ';
 }
-<<<<<<< HEAD
+
 else
 {
  $query .= 'ORDER BY id DESC ';
 }
-=======
-
->>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
 
 $query1 = '';
 

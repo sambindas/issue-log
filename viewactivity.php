@@ -67,7 +67,6 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
             <div class="container"><br>
                 <a href="newactivity.php" id="newissue" class="btn btn-primary btn-flat">New Activity</a><br><br>
                 <h1>Activity For Week <?php echo "$week of $month $year"; ?></h1><br><br>
-<<<<<<< HEAD
 
                 <!-- <div class="form-group" style="margin-bottom:20px">
                     <div class="col-sm-12">
@@ -82,8 +81,6 @@ $query = "SELECT * from activity where month = '$month' and week = '$week' and y
                     </div>
                 </div> -->
 
-=======
->>>>>>> 73a4bdf69e114010c4c50e3741d290b8533fd234
                 <h3>Monday</h3><br>
                 <table class="table text-center" border="1" style="padding: 10px; width: 100%">
                 <?php 
